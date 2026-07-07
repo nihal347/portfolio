@@ -1,0 +1,250 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-void: #020308;
+  --color-term-dark: #0a0f1c;
+  --color-term-green: #39ff8f;
+  --color-cyan: #4df3ff;
+  --color-cyan-dim: #1e6b78;
+  --color-green: #39ff8f;
+  --color-green-dim: #1a6b45;
+  --color-magenta: #ff3df0;
+  --color-panel: #0a0f1c;
+  --color-panel-line: rgba(77,243,255,0.25);
+
+  /* Solar system inspired colors */
+  --color-sun: #fff8e0;
+  --color-sun-corona: #ffa500;
+  --color-mercury: #8c7e6d;
+  --color-venus: #c4a35a;
+  --color-earth: #3a7bd5;
+  --color-mars: #c45a3c;
+  --color-jupiter: #c4915a;
+  --color-saturn: #e8d5a3;
+  --color-neptune: #3a5fc4;
+
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-pixel: 'Press Start 2P', monospace;
+  
+  --shadow-glow: 0 0 14px rgba(77,243,255,0.8), 0 0 28px rgba(77,243,255,0.4);
+  --shadow-glow-cyan: 0 0 14px rgba(77,243,255,0.8), 0 0 28px rgba(77,243,255,0.4);
+  --shadow-glow-green: 0 0 6px rgba(57,255,143,0.55);
+  --shadow-glow-magenta: 0 0 8px rgba(255,61,240,0.6);
+  --shadow-panel: 0 0 30px rgba(77,243,255,0.15), inset 0 0 40px rgba(77,243,255,0.04);
+}
+
+@layer base {
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; width: 100%; height: 100%;
+    background: var(--color-void);
+    overflow: hidden;
+    font-family: var(--font-mono);
+    color: var(--color-term-green);
+    user-select: none;
+  }
+  #root {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/* ---------- CRT chrome ---------- */
+.scanlines {
+  position: relative;
+}
+.scanlines::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.12) 0px,
+    rgba(0,0,0,0.12) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: overlay;
+  opacity: 0.35;
+}
+
+.vignette {
+  position: fixed; inset: 0; pointer-events: none; z-index: 101;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.65) 100%);
+}
+
+/* ---------- Cockpit viewport mask ---------- */
+/* Creates a curved windshield feel — visible center, darkened curved edges */
+.cockpit-viewport-mask {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 41;
+  mask-image: radial-gradient(
+    ellipse 85% 80% at 50% 48%,
+    black 60%,
+    transparent 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 85% 80% at 50% 48%,
+    black 60%,
+    transparent 100%
+  );
+}
+
+/* ---------- Dashboard strip — bottom console surface ---------- */
+.cockpit-dashboard {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: 180px;
+  pointer-events: none;
+  z-index: 39;
+  background: linear-gradient(
+    to top,
+    rgba(8,12,24,0.92) 0%,
+    rgba(8,12,24,0.7) 40%,
+    rgba(8,12,24,0.3) 70%,
+    transparent 100%
+  );
+  border-top: 1px solid rgba(57,255,143,0.12);
+  box-shadow: 0 -8px 30px rgba(0,0,0,0.4);
+}
+
+/* ---------- Panel clip-path — angled corners ---------- */
+.cockpit-panel {
+  clip-path: polygon(
+    10px 0%,
+    calc(100% - 10px) 0%,
+    100% 10px,
+    100% calc(100% - 10px),
+    calc(100% - 10px) 100%,
+    10px 100%,
+    0% calc(100% - 10px),
+    0% 10px
+  );
+  background: rgba(8,12,24,0.85);
+  border: none; /* clip-path clips the border too, use box-shadow for edge glow */
+  box-shadow:
+    0 0 1px rgba(57,255,143,0.4),
+    inset 0 0 20px rgba(57,255,143,0.03);
+}
+
+/* Conduit line — connects panel to nearest screen edge */
+.cockpit-conduit-left::before {
+  content: '';
+  position: absolute;
+  left: -20px;
+  top: 50%;
+  width: 20px;
+  height: 1px;
+  background: linear-gradient(to left, rgba(57,255,143,0.3), transparent);
+}
+.cockpit-conduit-right::before {
+  content: '';
+  position: absolute;
+  right: -20px;
+  top: 50%;
+  width: 20px;
+  height: 1px;
+  background: linear-gradient(to right, rgba(57,255,143,0.3), transparent);
+}
+
+/* ---------- Center console scan line ---------- */
+@keyframes console-scan {
+  0% { top: 0; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.console-scanline {
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(57,255,143,0.15) 20%,
+    rgba(57,255,143,0.25) 50%,
+    rgba(57,255,143,0.15) 80%,
+    transparent 100%
+  );
+  pointer-events: none;
+  animation: console-scan 4s linear infinite;
+}
+
+/* ---------- Animations ---------- */
+.glitch-active { animation: glitchshift .18s steps(2,end); }
+@keyframes glitchshift {
+  0% { transform: translate(0,0); filter: hue-rotate(0deg); }
+  30% { transform: translate(-2px,1px); filter: hue-rotate(15deg); }
+  60% { transform: translate(2px,-1px); filter: hue-rotate(-10deg); }
+  100% { transform: translate(0,0); filter: hue-rotate(0deg); }
+}
+
+@keyframes blink { 0%,49%{opacity:1;} 50%,100%{opacity:0;} }
+.animate-blink { animation: blink 1s steps(1) infinite; }
+.animate-cursor-blink { animation: blink 1s steps(1) infinite; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+
+@keyframes zoomPulse {
+  0% { transform: scale(0.5); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes zoomGrid {
+  0% { transform: scale(0.5); opacity: 0; }
+  50% { opacity: 0.3; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+@keyframes planetHover {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.animate-planet-hover { animation: planetHover 1s ease-in-out infinite; }
+
+.pixelated { image-rendering: pixelated; }
+
+/* ---------- Page content scroll container ---------- */
+.page-scroll {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 2rem 1.5rem 4rem;
+  background: transparent;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar,
+.page-scroll::-webkit-scrollbar { width: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track,
+.page-scroll::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); }
+.custom-scrollbar::-webkit-scrollbar-thumb,
+.page-scroll::-webkit-scrollbar-thumb { background: var(--color-cyan-dim); }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover,
+.page-scroll::-webkit-scrollbar-thumb:hover { background: var(--color-cyan); }
+
+/* ---------- Cockpit zoom scan ---------- */
+@keyframes cockpit-scan {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+
+/* Cursor: crosshair on planets, default elsewhere */
+canvas { cursor: crosshair; }
+canvas.no-planet-hover { cursor: default; }
