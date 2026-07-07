@@ -1,19 +1,7 @@
-import { useStore } from '../store/useStore'
 import { TerminalText } from '../components/TerminalText'
-import { User, Code2, Database, BrainCircuit, TerminalSquare, ArrowLeft } from 'lucide-react'
+import { User, Code2, Database, BrainCircuit, TerminalSquare } from 'lucide-react'
 
 export function Profile() {
-  const { setView, setActivePlanet } = useStore()
-
-  const handleReturn = () => {
-    if ((window as any).__zoomOut) {
-      (window as any).__zoomOut();
-    } else {
-      setActivePlanet(null);
-      setView('hub');
-    }
-  }
-
   const bioText = `> Class: Self-Taught Developer
 > Base: Earth (Sec-42)
 
@@ -24,19 +12,7 @@ I'm a self-taught developer primarily focused on Python, currently forging a pat
 
   return (
     <div className="page-scroll">
-      {/* Top bar */}
-      <div className="fixed top-0 left-0 right-0 z-30 h-11 flex items-center px-5 gap-4" style={{ background: 'linear-gradient(to bottom, rgba(2,3,8,0.95), rgba(2,3,8,0.7), transparent)' }}>
-        <div className="flex items-center gap-2 text-[11px] font-pixel" style={{ color: 'var(--color-earth)' }}>
-          <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--color-earth)', boxShadow: '0 0 8px var(--color-earth)' }} />
-          PROFILE SECTOR
-        </div>
-        <div className="flex-1" />
-        <div className="text-[10px] font-mono px-2 py-0.5 border" style={{ color: 'rgba(109,179,242,0.5)', borderColor: 'rgba(109,179,242,0.2)' }}>
-          SECTOR // EARTH-CLASS
-        </div>
-      </div>
-      
-      <div className="max-w-5xl w-full mx-auto space-y-6 animate-fade-in text-left pt-14">
+      <div className="max-w-5xl w-full mx-auto space-y-6 animate-fade-in text-left pt-12">
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Profile Card */}
@@ -110,16 +86,6 @@ I'm a self-taught developer primarily focused on Python, currently forging a pat
                 </SkillGroup>
             </div>
         </div>
-
-        <button 
-          onClick={handleReturn}
-          className="mb-8 flex items-center gap-2 border px-5 py-2.5 transition-all font-bold cursor-pointer"
-          style={{ borderColor: 'rgba(58,123,213,0.5)', color: 'var(--color-earth)' }}
-          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(58,123,213,0.15)'; e.currentTarget.style.borderColor = 'var(--color-earth)'; e.currentTarget.style.boxShadow = '0 0 15px rgba(58,123,213,0.2)' }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(58,123,213,0.5)'; e.currentTarget.style.boxShadow = 'none' }}
-        >
-          <ArrowLeft size={14} /> &lt; RETURN TO ORBIT
-        </button>
       </div>
     </div>
   )
@@ -145,7 +111,6 @@ function SkillNode({ name, level, status }: { name: string; level: number; statu
                 <div className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--color-earth)', opacity: 0.5 }}></div>
                 <span className="text-[11px]" style={{ color: 'rgba(109,179,242,0.8)' }}>{name}</span>
             </div>
-            {/* Skill bar */}
             <div className="mt-1 h-[4px] border ml-3.5" style={{ borderColor: 'rgba(58,123,213,0.15)' }}>
               <div className="h-full transition-all duration-500" style={{ width: `${level}%`, background: `linear-gradient(to right, var(--color-earth), rgba(58,123,213,0.3))` }} />
             </div>

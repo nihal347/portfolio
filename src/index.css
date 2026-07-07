@@ -77,40 +77,38 @@
 }
 
 /* ---------- Cockpit viewport mask ---------- */
-/* Creates a curved windshield feel — visible center, darkened curved edges */
+/* Subtle curved edge darkening — not a hard mask */
 .cockpit-viewport-mask {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 41;
   mask-image: radial-gradient(
-    ellipse 85% 80% at 50% 48%,
-    black 60%,
+    ellipse 92% 88% at 50% 48%,
+    black 70%,
     transparent 100%
   );
   -webkit-mask-image: radial-gradient(
-    ellipse 85% 80% at 50% 48%,
-    black 60%,
+    ellipse 92% 88% at 50% 48%,
+    black 70%,
     transparent 100%
   );
 }
 
-/* ---------- Dashboard strip — bottom console surface ---------- */
+/* ---------- Dashboard strip — subtle bottom surface ---------- */
 .cockpit-dashboard {
   position: fixed;
   left: 0; right: 0; bottom: 0;
-  height: 180px;
+  height: 100px;
   pointer-events: none;
   z-index: 39;
   background: linear-gradient(
     to top,
-    rgba(8,12,24,0.92) 0%,
-    rgba(8,12,24,0.7) 40%,
-    rgba(8,12,24,0.3) 70%,
+    rgba(8,12,24,0.6) 0%,
+    rgba(8,12,24,0.2) 50%,
     transparent 100%
   );
-  border-top: 1px solid rgba(57,255,143,0.12);
-  box-shadow: 0 -8px 30px rgba(0,0,0,0.4);
+  border-top: 1px solid rgba(57,255,143,0.06);
 }
 
 /* ---------- Panel clip-path — angled corners ---------- */
@@ -248,3 +246,294 @@
 /* Cursor: crosshair on planets, default elsewhere */
 canvas { cursor: crosshair; }
 canvas.no-planet-hover { cursor: default; }
+
+/* ---------- Cockpit frame ---------- */
+.cockpit-frame {
+  position: fixed;
+  inset: 0;
+  z-index: 42;
+  pointer-events: none;
+}
+
+/* Hexagonal holographic border */
+.cockpit-frame::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    /* Top hex pattern */
+    linear-gradient(135deg, rgba(57,255,143,0.08) 25%, transparent 25%) -10px 0,
+    linear-gradient(225deg, rgba(57,255,143,0.08) 25%, transparent 25%) -10px 0,
+    linear-gradient(315deg, rgba(57,255,143,0.08) 25%, transparent 25%),
+    linear-gradient(45deg, rgba(57,255,143,0.08) 25%, transparent 25%);
+  background-size: 20px 20px;
+  background-color: transparent;
+  opacity: 0.6;
+  mask: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 15%),
+        linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 15%),
+        linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 10%),
+        linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 10%);
+  mask-composite: add;
+  -webkit-mask-composite: source-over;
+}
+
+/* Hex border glow */
+.cockpit-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(57,255,143,0.15);
+  box-shadow: 
+    inset 0 0 30px rgba(57,255,143,0.05),
+    0 0 20px rgba(57,255,143,0.03);
+  mask: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 20%),
+        linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 20%),
+        linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 15%),
+        linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 15%);
+  mask-composite: add;
+  -webkit-mask-composite: source-over;
+}
+
+/* Corner hex accents */
+.cockpit-hex-corner {
+  position: fixed;
+  width: 80px;
+  height: 80px;
+  pointer-events: none;
+  z-index: 43;
+}
+.cockpit-hex-corner svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 4px rgba(57,255,143,0.3));
+}
+.cockpit-hex-corner--tl { top: 0; left: 0; }
+.cockpit-hex-corner--tr { top: 0; right: 0; transform: scaleX(-1); }
+.cockpit-hex-corner--bl { bottom: 0; left: 0; transform: scaleY(-1); }
+.cockpit-hex-corner--br { bottom: 0; right: 0; transform: scale(-1, -1); }
+
+/* Edge hex lines */
+.cockpit-hex-edge {
+  position: fixed;
+  pointer-events: none;
+  z-index: 43;
+}
+.cockpit-hex-edge--top,
+.cockpit-hex-edge--bottom {
+  left: 80px;
+  right: 80px;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(57,255,143,0.2) 20%, 
+    rgba(57,255,143,0.3) 50%, 
+    rgba(57,255,143,0.2) 80%, 
+    transparent
+  );
+}
+.cockpit-hex-edge--top { top: 8px; }
+.cockpit-hex-edge--bottom { bottom: 8px; }
+.cockpit-hex-edge--left,
+.cockpit-hex-edge--right {
+  top: 80px;
+  bottom: 80px;
+  width: 2px;
+  background: linear-gradient(180deg, 
+    transparent, 
+    rgba(57,255,143,0.2) 20%, 
+    rgba(57,255,143,0.3) 50%, 
+    rgba(57,255,143,0.2) 80%, 
+    transparent
+  );
+}
+.cockpit-hex-edge--left { left: 8px; }
+.cockpit-hex-edge--right { right: 8px; }
+
+/* Hex tick marks */
+.cockpit-hex-tick {
+  position: fixed;
+  pointer-events: none;
+  z-index: 43;
+  font-family: var(--font-mono);
+  font-size: 6px;
+  color: rgba(57,255,143,0.3);
+}
+
+/* ---------- Cockpit floating boxes ---------- */
+.floating-box {
+  background: rgba(2,3,8,0.8);
+  padding: 8px 10px;
+  min-width: 120px;
+  pointer-events: auto;
+}
+.fb-title {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  letter-spacing: 0.15em;
+  color: #39ff8f;
+  text-shadow: 0 0 6px rgba(57,255,143,0.4);
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(57,255,143,0.2);
+}
+.fb-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: #39ff8f;
+  text-shadow: 0 0 4px rgba(57,255,143,0.3);
+  margin-bottom: 2px;
+}
+.fb-big {
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  color: #39ff8f;
+  text-shadow: 0 0 8px rgba(57,255,143,0.4);
+  margin-bottom: 6px;
+}
+.fb-bar {
+  height: 3px;
+  background: rgba(57,255,143,0.1);
+  margin-bottom: 6px;
+}
+.fb-bar-fill {
+  height: 100%;
+  background: #39ff8f;
+  box-shadow: 0 0 6px rgba(57,255,143,0.4);
+  transition: width 0.7s ease;
+}
+.fb-text {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: #39ff8f;
+  text-shadow: 0 0 4px rgba(57,255,143,0.3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fb-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: #39ff8f;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+.fb-btn:hover {
+  color: #39ff8f;
+  background: rgba(57,255,143,0.1);
+}
+.fb-btn-lg {
+  font-size: 9px;
+  padding: 5px 14px;
+}
+.fb-square-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 10px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: #39ff8f;
+  background: rgba(57,255,143,0.06);
+  border: 1px solid rgba(57,255,143,0.3);
+  cursor: pointer;
+  transition: all 0.12s ease;
+  text-decoration: none;
+  min-width: 48px;
+  text-align: center;
+}
+.fb-square-btn:hover {
+  color: #39ff8f;
+  border-color: rgba(57,255,143,0.6);
+  background: rgba(57,255,143,0.1);
+}
+
+/* ---------- Cockpit box buttons ---------- */
+.box-btn {
+  background: rgba(57,255,143,0.04);
+  border: 1px solid rgba(57,255,143,0.12);
+  color: #1a6b45;
+  clip-path: polygon(
+    4px 0%, calc(100% - 4px) 0%,
+    100% 4px, 100% calc(100% - 4px),
+    calc(100% - 4px) 100%, 4px 100%,
+    0% calc(100% - 4px), 0% 4px
+  );
+  transition: all 0.15s ease;
+}
+.box-btn:hover {
+  color: #39ff8f;
+  background: rgba(57,255,143,0.1);
+  border-color: rgba(57,255,143,0.35);
+  box-shadow: 0 0 12px rgba(57,255,143,0.2), inset 0 0 8px rgba(57,255,143,0.05);
+}
+
+/* ---------- Radar sweep ---------- */
+@keyframes radarRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.radar-sweep {
+  animation: radarRotate 3s linear infinite;
+}
+.radar-blip {
+  filter: drop-shadow(0 0 4px currentColor);
+}
+
+/* Custom cursor — green dot + ring */
+.custom-cursor-dot {
+  pointer-events: none;
+  position: fixed;
+  width: 6px;
+  height: 6px;
+  background: var(--color-green);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--color-green), 0 0 12px rgba(57,255,143,0.3);
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+}
+.custom-cursor-ring {
+  pointer-events: none;
+  position: fixed;
+  width: 20px;
+  height: 20px;
+  border: 1px solid rgba(57,255,143,0.35);
+  border-radius: 50%;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: width 0.15s ease, height 0.15s ease, border-color 0.15s ease;
+}
+
+/* Hide default cursor on interactive elements */
+.hide-cursor,
+.hide-cursor * {
+  cursor: none !important;
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .animate-blink,
+  .animate-cursor-blink,
+  .animate-pulse,
+  .animate-spin {
+    animation: none !important;
+  }
+  .animate-fade-in {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+  .console-scanline {
+    animation: none !important;
+  }
+  .cockpit-scan {
+    animation: none !important;
+  }
+}

@@ -1,13 +1,18 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type ViewState = 'boot' | 'hub' | 'profile' | 'missions' | 'comms'
-export type PlanetType = 'comms' | 'profile' | 'missions' | null
+export type ViewState = 'boot' | 'hub' | 'profile' | 'projects' | 'comms' | 'techstack' | 'missions' | 'learning'
+export type PlanetType = 'about' | 'techstack' | 'projects' | 'missions' | 'learning' | 'comms' | null
+export type ShipPhase = 'idle' | 'locking' | 'zoomIn' | 'arrived' | 'zoomOut'
+
+interface LogEntry {
+  msg: string
+  time: number
+}
 
 interface AppState {
   currentView: ViewState
   activePlanet: PlanetType
-  zoomTransition: { active: boolean; phase: 'zooming' | 'zooming-out' | 'arrived' | 'idle' }
   exploration: number
   achievements: {
     firstVisit: boolean
@@ -15,27 +20,34 @@ interface AppState {
     konamiCode: boolean
     fullExploration: boolean
     resumeDownloaded: boolean
+    easterEgg: boolean
   }
   settings: {
     soundEnabled: boolean
     simpleView: boolean
   }
-  
-  // Actions
+
+  ship: {
+    phase: ShipPhase
+    target: PlanetType
+    startTime: number
+  }
+
+  log: LogEntry[]
+
   setView: (view: ViewState) => void
   setActivePlanet: (planet: PlanetType) => void
-  setZoomTransition: (t: { active: boolean; phase: 'zooming' | 'zooming-out' | 'arrived' | 'idle' }) => void
   addExploration: (amount: number) => void
   unlockAchievement: (key: keyof AppState['achievements']) => void
   toggleSound: () => void
   toggleSimpleView: () => void
   resetState: () => void
-  
-  // UI Overlays
-  commsOpen: boolean
-  setCommsOpen: (isOpen: boolean) => void
-  flightPanel: { isOpen: boolean, title: string, targetView: ViewState | null }
-  setFlightPanel: (panel: { isOpen: boolean, title: string, targetView: ViewState | null }) => void
+  pushLog: (msg: string) => void
+
+  initiateTravel: (target: PlanetType) => void
+  arrive: () => void
+  initiateReturn: () => void
+  finishReturn: () => void
 }
 
 export const useStore = create<AppState>()(
@@ -43,57 +55,124 @@ export const useStore = create<AppState>()(
     (set, get) => ({
       currentView: 'boot',
       activePlanet: null,
-      zoomTransition: { active: false, phase: 'idle' },
-      commsOpen: false,
-      flightPanel: { isOpen: false, title: '', targetView: null },
       exploration: 0,
+      ship: { phase: 'idle', target: null, startTime: 0 },
+      log: [{ msg: 'sys: orbit engine nominal', time: Date.now() }],
       achievements: {
         firstVisit: false,
         hiddenTerminal: false,
         konamiCode: false,
         fullExploration: false,
-        resumeDownloaded: false
+        resumeDownloaded: false,
+        easterEgg: false,
       },
       settings: {
         soundEnabled: false,
-        simpleView: false
+        simpleView: false,
       },
-      
-      setCommsOpen: (isOpen) => set({ commsOpen: isOpen }),
-      setFlightPanel: (panel) => set({ flightPanel: panel }),
+
       setActivePlanet: (planet) => set({ activePlanet: planet }),
-      setZoomTransition: (t) => set({ zoomTransition: t }),
-      
       setView: (view) => set({ currentView: view }),
+
+      pushLog: (msg) =>
+        set((s) => ({
+          log: [...s.log.slice(-19), { msg, time: Date.now() }],
+        })),
+
       addExploration: (amount) => {
-        const current = get().exploration;
-        if (current >= 100) return;
-        const next = Math.min(100, current + amount);
-        set({ exploration: next });
+        const current = get().exploration
+        if (current >= 100) return
+        const next = Math.min(100, current + amount)
+        set({ exploration: next })
         if (next === 100 && !get().achievements.fullExploration) {
-          get().unlockAchievement('fullExploration');
+          get().unlockAchievement('fullExploration')
         }
       },
-      unlockAchievement: (key) => set((state) => ({
-        achievements: { ...state.achievements, [key]: true }
-      })),
-      toggleSound: () => set((state) => ({
-        settings: { ...state.settings, soundEnabled: !state.settings.soundEnabled }
-      })),
-      toggleSimpleView: () => set((state) => ({
-        settings: { ...state.settings, simpleView: !state.settings.simpleView }
-      })),
-      resetState: () => set({
-        currentView: 'boot',
-        exploration: 0,
-        achievements: { firstVisit: false, hiddenTerminal: false, konamiCode: false, fullExploration: false, resumeDownloaded: false }
-      })
+
+      unlockAchievement: (key) =>
+        set((s) => ({
+          achievements: { ...s.achievements, [key]: true },
+        })),
+
+      toggleSound: () =>
+        set((s) => ({
+          settings: { ...s.settings, soundEnabled: !s.settings.soundEnabled },
+        })),
+
+      toggleSimpleView: () =>
+        set((s) => ({
+          settings: { ...s.settings, simpleView: !s.settings.simpleView },
+        })),
+
+      resetState: () =>
+        set({
+          currentView: 'boot',
+          exploration: 0,
+          ship: { phase: 'idle', target: null, startTime: 0 },
+          achievements: {
+            firstVisit: false,
+            hiddenTerminal: false,
+            konamiCode: false,
+            fullExploration: false,
+            resumeDownloaded: false,
+            easterEgg: false,
+          },
+        }),
+
+      initiateTravel: (target) => {
+        const s = get()
+        if (!target) return
+        // Cancel any in-progress transition and start fresh
+        if (s.ship.phase !== 'idle' && s.ship.phase !== 'arrived') {
+          get().pushLog('sys: aborting previous trajectory')
+        }
+        const label = target.toUpperCase()
+        get().pushLog(`sys: engaging thrusters → ${label}`)
+        set({
+          ship: { phase: 'locking', target, startTime: performance.now() },
+        })
+      },
+
+      arrive: () => {
+        const s = get()
+        const target = s.ship.target
+        if (!target) return
+        const viewMap: Record<string, ViewState> = { about: 'profile', techstack: 'techstack', projects: 'projects', missions: 'missions', learning: 'learning', comms: 'comms' }
+        const view = viewMap[target] || 'hub'
+        get().pushLog(`sys: arrived at ${target.toUpperCase()}`)
+        set({
+          ship: { phase: 'arrived', target, startTime: performance.now() },
+          activePlanet: target,
+          currentView: view,
+        })
+        setTimeout(() => {
+          set({ ship: { phase: 'idle', target: null, startTime: 0 } })
+        }, 100)
+      },
+
+      initiateReturn: () => {
+        const s = get()
+        if (s.ship.phase !== 'idle') return
+        get().pushLog('sys: returning to orbit...')
+        set({
+          ship: { phase: 'zoomOut', target: null, startTime: performance.now() },
+        })
+      },
+
+      finishReturn: () => {
+        set({
+          ship: { phase: 'idle', target: null, startTime: 0 },
+          activePlanet: null,
+          currentView: 'hub',
+        })
+        get().pushLog('sys: orbit established')
+      },
     }),
     {
       name: 'jacked-in-storage',
-      partialize: (state) => ({ 
-        achievements: state.achievements, 
-        settings: state.settings 
+      partialize: (state) => ({
+        achievements: state.achievements,
+        settings: state.settings,
       }),
     }
   )

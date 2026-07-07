@@ -25,21 +25,62 @@ export interface Body {
   bandSeed?: number;
 }
 
+export interface Asteroid {
+  name: string;
+  label: string;
+  orbitRadius: number;
+  angle: number;
+  speed: number;
+  size: number;
+  x: number;
+  y: number;
+  hover?: boolean;
+}
+
+export interface Satellite {
+  name: string;
+  status: string;
+  experience: string;
+  level: number;
+  description: string;
+  usedFor: string[];
+  orbitRadius: number;
+  angle: number;
+  speed: number;
+  size: number;
+  x: number;
+  y: number;
+  hover?: boolean;
+  paused?: boolean;
+}
+
+export interface Project {
+  name: string;
+  description: string;
+  tech: string[];
+  github: string;
+  tags: string[];
+}
+
 export class SpaceEngine {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   bodies: Body[] = [];
+  asteroids: Asteroid[] = [];
+  satellites: Satellite[] = [];
+  projects: Project[] = [];
+  hoveredSatellite: Satellite | null = null;
+  hoveredAsteroid: Asteroid | null = null;
   stars: {x: number, y: number, layer: number, brightness: number}[] = [];
   nebulaClouds: {x: number, y: number, radius: number, color: string, opacity: number}[] = [];
   
-  MU = 800000;
+  MU = 200000;
   cx = 0;
   cy = 0;
   
-  ship = { x: 0, y: 0, vx: 0, vy: 0 };
   mouseX = 0;
   mouseY = 0;
-
+  
   layers = [
     { count: 120, speed: 0.015, size: 0.8, color: 'rgba(180,200,255,0.4)' },
     { count: 80, speed: 0.035, size: 1.2, color: 'rgba(200,220,255,0.6)' },
@@ -77,43 +118,206 @@ export class SpaceEngine {
       });
     }
 
-    this.ship = { x: this.cx, y: this.cy + 40, vx: 0, vy: 0 };
-    this.mouseX = this.cx;
-    this.mouseY = this.cy;
-
     // Solar system inspired planets with 3D shading colors
     this.bodies = [
-      this.circularBody(110, Math.PI*0.5, {
-        name:'comms',    
-        label:'COMMS', 
-        baseColor:'#c45a3c',
-        highlightColor:'#e8956a',
-        shadowColor:'#6b2a1a',
+      this.circularBody(70, Math.PI*0.5, {
+        name:'about',    
+        label:'ABOUT ME', 
+        baseColor:'#8a8a8a',
+        highlightColor:'#b0b0b0',
+        shadowColor:'#4a4a4a',
         radius: 6,
         hasRing: false,
         rotationAngle: 0
       }),
-      this.circularBody(185, Math.PI*1.2, {
-        name:'profile',  
-        label:'PROFILE',     
-        baseColor:'#3a7bd5',
-        highlightColor:'#6db3f2',
-        shadowColor:'#1a3a6b',
-        radius: 12,
-        hasRing: true,
-        ringColor: 'rgba(180,200,220,0.4)',
-        rotationAngle: 0
-      }),
-      this.circularBody(275, Math.PI*0.1, {
-        name:'missions', 
-        label:'MISSIONS',    
-        baseColor:'#8b5a2b',
-        highlightColor:'#c4915a',
-        shadowColor:'#4a2f15',
+      this.circularBody(120, Math.PI*1.2, {
+        name:'techstack', 
+        label:'TECH STACK',    
+        baseColor:'#c49a3c',
+        highlightColor:'#e8c56a',
+        shadowColor:'#6b5a1a',
         radius: 10,
         hasRing: false,
         rotationAngle: 0
+      }),
+      this.circularBody(175, Math.PI*0.1, {
+        name:'projects', 
+        label:'PROJECTS',    
+        baseColor:'#2a6b3a',
+        highlightColor:'#4aa86a',
+        shadowColor:'#1a3a25',
+        radius: 9,
+        hasRing: false,
+        rotationAngle: 0
+      }),
+      this.circularBody(230, Math.PI*1.8, {
+        name:'missions', 
+        label:'MISSIONS',    
+        baseColor:'#5a3a8b',
+        highlightColor:'#8a6abf',
+        shadowColor:'#2a1a4a',
+        radius: 12,
+        hasRing: false,
+        rotationAngle: 0
+      }),
+      this.circularBody(320, Math.PI*0.8, {
+        name:'learning', 
+        label:'LEARNING',    
+        baseColor:'#8b6a2b',
+        highlightColor:'#c49a5a',
+        shadowColor:'#4a3a15',
+        radius: 10,
+        hasRing: true,
+        ringColor: 'rgba(200,180,140,0.4)',
+        rotationAngle: 0
+      }),
+      this.circularBody(400, Math.PI*1.5, {
+        name:'comms',  
+        label:'COMMS',     
+        baseColor:'#c45a3c',
+        highlightColor:'#e8956a',
+        shadowColor:'#6b2a1a',
+        radius: 5,
+        hasRing: false,
+        rotationAngle: 0
       })
+    ];
+
+    // Tech stack asteroid belt between profile (185) and missions (275)
+    const techStack = [
+      'Python', 'C', 'C#', 'HTML5', 'CSS3', 'JavaScript', 'SQL',
+      'Machine Learning', 'Deep Learning', 'Scikit-learn', 'TensorFlow', 'PyTorch',
+      'NumPy', 'Pandas', 'Matplotlib', 'Jupyter Notebook', 'Flask', 'FastAPI',
+      'REST API', 'React', 'MongoDB', 'SQLite', 'BeautifulSoup', 'Requests',
+      'Selenium', 'lxml', 'OpenCV', 'YOLO', 'Hugging Face', 'LangChain',
+      'Ollama', 'Whisper', 'GPT4All', 'Git', 'GitHub', 'VS Code',
+      'Cursor', 'Linux', 'Windows', 'Anaconda', 'pip', 'virtualenv',
+      'Docker', 'MLOps', 'Pillow', 'SpeechRecognition', 'PyAudio', 'playsound',
+      'PyGame', 'ESP32', 'Arduino IDE', 'Data Analysis', 'Data Preprocessing',
+      'Feature Engineering', 'Model Evaluation', 'Supervised Learning', 'Unsupervised Learning',
+      'Computer Vision', 'NLP', 'LLMs', 'Transformers', 'Prompt Engineering',
+      'Web Scraping', 'Automation', 'API Integration', 'Environment Variables',
+      'Gunicorn', 'Render', 'requirements.txt', 'OOP', 'Calculus',
+      'Linear Algebra', 'Probability & Statistics'
+    ];
+    
+    const beltRadius = 275;
+    techStack.forEach((name, i) => {
+      const angle = (i / techStack.length) * Math.PI * 2;
+      const speed = 0.08 + Math.random() * 0.04;
+      const size = 2 + Math.random() * 2;
+      const orbitOffset = (Math.random() - 0.5) * 20;
+      this.asteroids.push({
+        name,
+        label: name,
+        orbitRadius: beltRadius + orbitOffset,
+        angle,
+        speed,
+        size,
+        x: this.cx + (beltRadius + orbitOffset) * Math.cos(angle),
+        y: this.cy + (beltRadius + orbitOffset) * Math.sin(angle),
+      });
+    });
+
+    // Tech stack satellites for zoomed view
+    const techData = [
+      { name: 'PYTHON', status: 'ONLINE', experience: '4+ Years', level: 90, description: 'Core language for AI/ML and automation', usedFor: ['Machine Learning', 'Automation', 'Backend', 'APIs', 'Data Analysis'], category: 'CORE SYSTEMS' },
+      { name: 'C', status: 'ONLINE', experience: '1+ Years', level: 40, description: 'Low-level systems programming', usedFor: ['Systems Programming', 'Performance'], category: 'CORE SYSTEMS' },
+      { name: 'C#', status: 'ONLINE', experience: '1+ Years', level: 35, description: 'Object-oriented application development', usedFor: ['Desktop Apps', 'Game Dev'], category: 'CORE SYSTEMS' },
+      { name: 'JAVASCRIPT', status: 'ONLINE', experience: '2+ Years', level: 60, description: 'Web development and scripting', usedFor: ['Frontend', 'Web Apps', 'Node.js'], category: 'CORE SYSTEMS' },
+      { name: 'SCIKIT-LEARN', status: 'ONLINE', experience: '2+ Years', level: 70, description: 'Machine learning library for Python', usedFor: ['ML Models', 'Data Mining', 'Classification'], category: 'AI MODULES' },
+      { name: 'PYTORCH', status: 'LEARNING', experience: '6+ Months', level: 35, description: 'Deep learning framework', usedFor: ['Neural Networks', 'Research'], category: 'AI MODULES' },
+      { name: 'TENSORFLOW', status: 'LEARNING', experience: '6+ Months', level: 30, description: 'Production ML platform', usedFor: ['Deep Learning', 'Deployment'], category: 'AI MODULES' },
+      { name: 'NUMPY', status: 'ONLINE', experience: '3+ Years', level: 80, description: 'Numerical computing library', usedFor: ['Data Processing', 'Math Operations'], category: 'AI MODULES' },
+      { name: 'PANDAS', status: 'ONLINE', experience: '3+ Years', level: 75, description: 'Data manipulation and analysis', usedFor: ['Data Analysis', 'CSV Processing'], category: 'AI MODULES' },
+      { name: 'OPENCV', status: 'ONLINE', experience: '2+ Years', level: 65, description: 'Computer vision library', usedFor: ['Image Processing', 'Object Detection'], category: 'AI MODULES' },
+      { name: 'HUGGING FACE', status: 'ONLINE', experience: '1+ Years', level: 55, description: 'Transformer models platform', usedFor: ['NLP', 'LLMs', 'Model Hub'], category: 'AI MODULES' },
+      { name: 'FLASK', status: 'ONLINE', experience: '2+ Years', level: 70, description: 'Lightweight web framework', usedFor: ['APIs', 'Web Apps', 'Backends'], category: 'WEB MODULES' },
+      { name: 'FASTAPI', status: 'ONLINE', experience: '1+ Years', level: 60, description: 'Modern async API framework', usedFor: ['REST APIs', 'Microservices'], category: 'WEB MODULES' },
+      { name: 'STREAMLIT', status: 'ONLINE', experience: '1+ Years', level: 55, description: 'Rapid data app prototyping', usedFor: ['Data Apps', 'Dashboards', 'Prototyping'], category: 'WEB MODULES' },
+      { name: 'REST API', status: 'ONLINE', experience: '2+ Years', level: 70, description: 'API design and integration', usedFor: ['Web Services', 'Integration'], category: 'WEB MODULES' },
+      { name: 'MONGODB', status: 'ONLINE', experience: '1+ Years', level: 50, description: 'NoSQL document database', usedFor: ['Data Storage', 'Backend DB'], category: 'DATA CORE' },
+      { name: 'SQLITE', status: 'ONLINE', experience: '2+ Years', level: 60, description: 'Lightweight SQL database', usedFor: ['Local Storage', 'Embedded DB'], category: 'DATA CORE' },
+      { name: 'GIT', status: 'ONLINE', experience: '3+ Years', level: 80, description: 'Version control system', usedFor: ['Code Management', 'Collaboration'], category: 'SHIP TOOLS' },
+      { name: 'GITHUB', status: 'ONLINE', experience: '3+ Years', level: 75, description: 'Code hosting platform', usedFor: ['Repositories', 'CI/CD', 'Portfolio'], category: 'SHIP TOOLS' },
+      { name: 'VS CODE', status: 'ONLINE', experience: '3+ Years', level: 90, description: 'Primary code editor', usedFor: ['Development', 'Debugging', 'Extensions'], category: 'SHIP TOOLS' },
+      { name: 'JUPYTER', status: 'ONLINE', experience: '2+ Years', level: 70, description: 'Interactive notebooks', usedFor: ['Data Science', 'Prototyping', 'Visualization'], category: 'SHIP TOOLS' },
+      { name: 'DOCKER', status: 'LEARNING', experience: '3+ Months', level: 25, description: 'Containerization platform', usedFor: ['Deployment', 'Containers'], category: 'SHIP TOOLS' },
+      { name: 'BEAUTIFULSOUP', status: 'ONLINE', experience: '2+ Years', level: 70, description: 'Web scraping library', usedFor: ['Scraping', 'HTML Parsing'], category: 'AUTOMATION SUITE' },
+      { name: 'REQUESTS', status: 'ONLINE', experience: '3+ Years', level: 85, description: 'HTTP client library', usedFor: ['API Calls', 'Web Requests'], category: 'AUTOMATION SUITE' },
+      { name: 'SELENIUM', status: 'ONLINE', experience: '1+ Years', level: 55, description: 'Browser automation', usedFor: ['Web Automation', 'Testing'], category: 'AUTOMATION SUITE' },
+      { name: 'HTML', status: 'ONLINE', experience: '3+ Years', level: 85, description: 'Markup language for web pages', usedFor: ['Web Structure', 'Semantic HTML'], category: 'FRONTEND' },
+      { name: 'CSS', status: 'ONLINE', experience: '3+ Years', level: 80, description: 'Styling and layout', usedFor: ['Styling', 'Responsive Design', 'Animations'], category: 'FRONTEND' },
+      { name: 'STREAMLIT', status: 'ONLINE', experience: '1+ Years', level: 55, description: 'Rapid data app prototyping', usedFor: ['Data Apps', 'Dashboards'], category: 'FRONTEND' },
+    ];
+
+    const satOrbits = [50, 75, 100, 130, 160];
+    let catIndex = 0;
+    let satInCat = 0;
+    techData.forEach((tech, i) => {
+      if (i > 0 && tech.category !== techData[i-1].category) {
+        catIndex = (catIndex + 1) % satOrbits.length;
+        satInCat = 0;
+      }
+      const orbitR = satOrbits[catIndex];
+      const angle = (satInCat / 6) * Math.PI * 2 + catIndex * 0.5;
+      const speed = 0.15 + Math.random() * 0.1;
+      this.satellites.push({
+        ...tech,
+        orbitRadius: orbitR,
+        angle,
+        speed,
+        size: 4,
+        x: 0,
+        y: 0,
+      });
+      satInCat++;
+    });
+
+    // Projects data
+    this.projects = [
+      {
+        name: 'SVJARVIS',
+        description: 'AI assistant with voice control, jarvis-style interface',
+        tech: ['Python', 'SpeechRecognition', 'OpenAI', 'PyAudio'],
+        github: 'https://github.com/nihal/SVJARVIS',
+        tags: ['AI', 'Voice', 'Python']
+      },
+      {
+        name: 'SOULFRAME',
+        description: 'Souls-like game engine with AI enemies',
+        tech: ['Python', 'PyGame', 'AI/ML'],
+        github: 'https://github.com/nihal/SOULFRAME',
+        tags: ['Game', 'AI', 'Python']
+      },
+      {
+        name: 'ESP32-WEATHER',
+        description: 'IoT weather station with ESP32',
+        tech: ['C++', 'ESP32', 'Arduino'],
+        github: 'https://github.com/nihal/ESP32-WEATHER',
+        tags: ['IoT', 'Hardware', 'C++']
+      },
+      {
+        name: 'AUTOML',
+        description: 'Automated machine learning pipeline',
+        tech: ['Python', 'scikit-learn', 'Pandas'],
+        github: 'https://github.com/nihal/AUTOML',
+        tags: ['ML', 'Automation', 'Python']
+      },
+      {
+        name: 'WEB-SRAPPER',
+        description: 'Web scraping toolkit with Selenium',
+        tech: ['Python', 'BeautifulSoup', 'Selenium'],
+        github: 'https://github.com/nihal/WEB-SRAPPER',
+        tags: ['Scraping', 'Automation', 'Python']
+      },
+      {
+        name: 'PORTFOLIO-SITE',
+        description: 'This space-themed portfolio website',
+        tech: ['TypeScript', 'React', 'Canvas'],
+        github: 'https://github.com/nihal/portfolio',
+        tags: ['Web', 'React', 'TypeScript']
+      },
     ];
   }
   
@@ -166,13 +370,15 @@ export class SpaceEngine {
       b.hover = Math.hypot(this.mouseX - b.x, this.mouseY - b.y) < b.radius + 12;
     });
 
-    // Ship
-    const ax = (this.mouseX - this.ship.x) * 34;
-    const ay = (this.mouseY - this.ship.y) * 34;
-    this.ship.vx += ax*dt; this.ship.vy += ay*dt;
-    const damp = Math.pow(0.04, dt);
-    this.ship.vx *= damp; this.ship.vy *= damp;
-    this.ship.x += this.ship.vx*dt; this.ship.y += this.ship.vy*dt;
+    // Asteroid belt
+    this.hoveredAsteroid = null;
+    this.asteroids.forEach(a => {
+      a.angle += a.speed * dt;
+      a.x = this.cx + a.orbitRadius * Math.cos(a.angle);
+      a.y = this.cy + a.orbitRadius * Math.sin(a.angle);
+      a.hover = Math.hypot(this.mouseX - a.x, this.mouseY - a.y) < a.size + 8;
+      if (a.hover) this.hoveredAsteroid = a;
+    });
   }
 
   draw(t: number, drawLabels = true) {
@@ -261,7 +467,7 @@ export class SpaceEngine {
     this.ctx.fillRect(this.cx + 2, this.cy + 1, 2, 2);
 
     // Orbit rings with depth effect
-    [110, 185, 275].forEach((r, i) => {
+    [70, 120, 175, 230, 320, 400].forEach((r, i) => {
       // Orbit path
       this.ctx.strokeStyle = `rgba(100,120,150,${0.15 - i * 0.03})`;
       this.ctx.lineWidth = 1;
@@ -343,16 +549,11 @@ export class SpaceEngine {
       
       this.ctx.restore();
 
-      // Label with background
+      // Label — text only, no background box
       if (drawLabels) {
         const labelY = b.y - b.radius - 16;
         this.ctx.font = "8px 'Press Start 2P', monospace";
         this.ctx.textAlign = 'center';
-        
-        // Label background
-        const textWidth = this.ctx.measureText(b.label).width;
-        this.ctx.fillStyle = b.hover ? 'rgba(0,0,0,0.8)' : 'rgba(0,0,0,0.5)';
-        this.ctx.fillRect(b.x - textWidth/2 - 4, labelY - 8, textWidth + 8, 12);
         
         // Label text
         this.ctx.fillStyle = b.hover ? '#ffffff' : b.highlightColor;
@@ -367,41 +568,245 @@ export class SpaceEngine {
       }
     });
 
-    // Ship with engine glow
-    this.ctx.save();
-    this.ctx.translate(this.ship.x, this.ship.y);
-    const angle = Math.atan2(this.ship.vy, this.ship.vx);
-    this.ctx.rotate(angle);
-    this.ctx.imageSmoothingEnabled = false;
-    const s = 3;
-    
-    // Engine exhaust
-    const exhaustLength = Math.min(12, Math.hypot(this.ship.vx, this.ship.vy) * 0.5);
-    if (exhaustLength > 1) {
-      const exhaustGrad = this.ctx.createLinearGradient(-s, 0, -s - exhaustLength, 0);
-      exhaustGrad.addColorStop(0, 'rgba(77,243,255,0.8)');
-      exhaustGrad.addColorStop(0.5, 'rgba(77,243,255,0.3)');
-      exhaustGrad.addColorStop(1, 'rgba(77,243,255,0)');
-      this.ctx.fillStyle = exhaustGrad;
-      this.ctx.fillRect(-s - exhaustLength, -s * 0.5, exhaustLength, s);
+    // Asteroid belt
+    this.asteroids.forEach(a => {
+      this.ctx.save();
+      
+      // Asteroid body
+      const color = a.hover ? '#39ff8f' : 'rgba(150,170,200,0.7)';
+      this.ctx.fillStyle = color;
+      this.ctx.beginPath();
+      this.ctx.arc(a.x, a.y, a.size, 0, Math.PI * 2);
+      this.ctx.fill();
+      
+      // Glow on hover
+      if (a.hover) {
+        this.ctx.shadowBlur = 12;
+        this.ctx.shadowColor = '#39ff8f';
+        this.ctx.strokeStyle = '#39ff8f';
+        this.ctx.lineWidth = 1;
+        this.ctx.stroke();
+        this.ctx.shadowBlur = 0;
+      }
+      
+      this.ctx.restore();
+    });
+
+    // Tooltip for hovered asteroid
+    if (this.hoveredAsteroid) {
+      const a = this.hoveredAsteroid;
+      const tooltip = a.label.toUpperCase();
+      this.ctx.save();
+      this.ctx.font = "7px 'Press Start 2P', monospace";
+      this.ctx.textAlign = 'center';
+      const metrics = this.ctx.measureText(tooltip);
+      const tw = metrics.width + 12;
+      const th = 16;
+      const tx = a.x;
+      const ty = a.y - a.size - 10;
+      
+      // Tooltip background
+      this.ctx.fillStyle = 'rgba(2,3,8,0.9)';
+      this.ctx.strokeStyle = '#39ff8f';
+      this.ctx.lineWidth = 1;
+      this.ctx.beginPath();
+      this.ctx.roundRect(tx - tw/2, ty - th/2, tw, th, 2);
+      this.ctx.fill();
+      this.ctx.stroke();
+      
+      // Tooltip text
+      this.ctx.fillStyle = '#39ff8f';
+      this.ctx.fillText(tooltip, tx, ty + 2);
+      this.ctx.restore();
     }
-    
-    // Ship body
-    const blocks = [
-      [3,-1],[3,0],[3,1],
-      [2,-1],[2,0],[2,1],
-      [1,-2],[1,2],
-      [0,-1],[0,1],
-      [-1,-1],[-1,0],[-1,1],
-      [-2,0]
-    ];
-    this.ctx.fillStyle = '#4df3ff';
-    blocks.forEach(p => { this.ctx.fillRect(p[0]*s, p[1]*s, s, s); });
-    
-    // Cockpit highlight
-    this.ctx.fillStyle = '#dffcff';
-    this.ctx.fillRect(2*s, -0.5*s, s, s);
-    this.ctx.restore();
+  }
+
+  drawTechStackZoomed(t: number) {
+    const W = this.canvas.width;
+    const H = this.canvas.height;
+    const cx = W / 2;
+    const cy = H / 2;
+
+    // Background
+    const bgGrad = this.ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * 0.7);
+    bgGrad.addColorStop(0, 'rgba(15,12,25,1)');
+    bgGrad.addColorStop(1, 'rgba(2,3,8,1)');
+    this.ctx.fillStyle = bgGrad;
+    this.ctx.fillRect(0, 0, W, H);
+
+    // Planet
+    const pulse = 1 + Math.sin(t / 600) * 0.03;
+    const planetR = 50 * pulse;
+    const planetGrad = this.ctx.createRadialGradient(cx - 15, cy - 15, 0, cx, cy, planetR);
+    planetGrad.addColorStop(0, '#e8c56a');
+    planetGrad.addColorStop(0.5, '#c49a3c');
+    planetGrad.addColorStop(1, '#6b5a1a');
+    this.ctx.fillStyle = planetGrad;
+    this.ctx.beginPath();
+    this.ctx.arc(cx, cy, planetR, 0, Math.PI * 2);
+    this.ctx.fill();
+
+    // Planet glow
+    this.ctx.shadowBlur = 30;
+    this.ctx.shadowColor = '#c49a3c';
+    this.ctx.strokeStyle = 'rgba(196,154,60,0.3)';
+    this.ctx.lineWidth = 2;
+    this.ctx.beginPath();
+    this.ctx.arc(cx, cy, planetR + 5, 0, Math.PI * 2);
+    this.ctx.stroke();
+    this.ctx.shadowBlur = 0;
+
+    // Satellites
+    this.hoveredSatellite = null;
+    this.satellites.forEach(s => {
+      s.angle += s.paused ? 0 : s.speed * 0.016;
+      s.x = cx + s.orbitRadius * Math.cos(s.angle);
+      s.y = cy + s.orbitRadius * Math.sin(s.angle);
+      s.hover = Math.hypot(this.mouseX - s.x, this.mouseY - s.y) < s.size + 6;
+      if (s.hover) {
+        this.hoveredSatellite = s;
+        s.paused = true;
+      } else {
+        s.paused = false;
+      }
+
+      // Orbit ring
+      this.ctx.strokeStyle = 'rgba(100,120,150,0.1)';
+      this.ctx.lineWidth = 0.5;
+      this.ctx.beginPath();
+      this.ctx.arc(cx, cy, s.orbitRadius, 0, Math.PI * 2);
+      this.ctx.stroke();
+
+      // Satellite dot
+      this.ctx.fillStyle = s.hover ? '#39ff8f' : 'rgba(200,220,255,0.7)';
+      this.ctx.beginPath();
+      this.ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+      this.ctx.fill();
+
+      if (s.hover) {
+        this.ctx.shadowBlur = 10;
+        this.ctx.shadowColor = '#39ff8f';
+        this.ctx.stroke();
+        this.ctx.shadowBlur = 0;
+      }
+    });
+
+    // Info panel for hovered satellite
+    if (this.hoveredSatellite) {
+      const s = this.hoveredSatellite;
+      const px = cx + 120;
+      const py = cy - 80;
+      const pw = 200;
+      const ph = 160;
+
+      this.ctx.fillStyle = 'rgba(2,3,8,0.92)';
+      this.ctx.strokeStyle = '#39ff8f';
+      this.ctx.lineWidth = 1;
+      this.ctx.beginPath();
+      this.ctx.roundRect(px, py, pw, ph, 4);
+      this.ctx.fill();
+      this.ctx.stroke();
+
+      this.ctx.fillStyle = '#39ff8f';
+      this.ctx.font = "bold 10px 'Press Start 2P', monospace";
+      this.ctx.textAlign = 'left';
+      this.ctx.fillText(s.name, px + 10, py + 20);
+
+      this.ctx.font = "7px 'Press Start 2P', monospace";
+      this.ctx.fillStyle = s.status === 'ONLINE' ? '#39ff8f' : '#e8c56a';
+      this.ctx.fillText(`STATUS: ${s.status}`, px + 10, py + 38);
+
+      this.ctx.fillStyle = 'rgba(57,255,143,0.6)';
+      this.ctx.fillText(`EXPERIENCE: ${s.experience}`, px + 10, py + 54);
+
+      // Level bar
+      this.ctx.fillStyle = 'rgba(57,255,143,0.15)';
+      this.ctx.fillRect(px + 10, py + 62, pw - 20, 6);
+      this.ctx.fillStyle = '#39ff8f';
+      this.ctx.fillRect(px + 10, py + 62, (pw - 20) * s.level / 100, 6);
+
+      this.ctx.fillStyle = 'rgba(57,255,143,0.6)';
+      this.ctx.font = "6px 'Press Start 2P', monospace";
+      this.ctx.fillText('USED FOR:', px + 10, py + 82);
+
+      s.usedFor.forEach((u, i) => {
+        this.ctx.fillStyle = 'rgba(57,255,143,0.5)';
+        this.ctx.fillText(`• ${u}`, px + 14, py + 96 + i * 12);
+      });
+    }
+  }
+
+  drawProjectsZoomed(t: number) {
+    const W = this.canvas.width;
+    const H = this.canvas.height;
+    const cx = W / 2;
+    const cy = H / 2;
+
+    // Background
+    const bgGrad = this.ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * 0.7);
+    bgGrad.addColorStop(0, 'rgba(10,20,15,1)');
+    bgGrad.addColorStop(1, 'rgba(2,3,8,1)');
+    this.ctx.fillStyle = bgGrad;
+    this.ctx.fillRect(0, 0, W, H);
+
+    // Planet
+    const pulse = 1 + Math.sin(t / 600) * 0.03;
+    const planetR = 45 * pulse;
+    const planetGrad = this.ctx.createRadialGradient(cx - 12, cy - 12, 0, cx, cy, planetR);
+    planetGrad.addColorStop(0, '#4aa86a');
+    planetGrad.addColorStop(0.5, '#2a6b3a');
+    planetGrad.addColorStop(1, '#1a3a25');
+    this.ctx.fillStyle = planetGrad;
+    this.ctx.beginPath();
+    this.ctx.arc(cx, cy, planetR, 0, Math.PI * 2);
+    this.ctx.fill();
+
+    // Planet glow
+    this.ctx.shadowBlur = 25;
+    this.ctx.shadowColor = '#2a6b3a';
+    this.ctx.strokeStyle = 'rgba(42,107,58,0.3)';
+    this.ctx.lineWidth = 2;
+    this.ctx.beginPath();
+    this.ctx.arc(cx, cy, planetR + 5, 0, Math.PI * 2);
+    this.ctx.stroke();
+    this.ctx.shadowBlur = 0;
+
+    // Project cards around planet
+    const cardW = 140;
+    const cardH = 70;
+    const startX = cx - 220;
+    const startY = cy - 120;
+
+    this.projects.forEach((p, i) => {
+      const col = i % 3;
+      const row = Math.floor(i / 3);
+      const px = startX + col * (cardW + 15);
+      const py = startY + row * (cardH + 15);
+
+      this.ctx.fillStyle = 'rgba(2,3,8,0.85)';
+      this.ctx.strokeStyle = 'rgba(57,255,143,0.3)';
+      this.ctx.lineWidth = 1;
+      this.ctx.beginPath();
+      this.ctx.roundRect(px, py, cardW, cardH, 3);
+      this.ctx.fill();
+      this.ctx.stroke();
+
+      this.ctx.fillStyle = '#39ff8f';
+      this.ctx.font = "bold 7px 'Press Start 2P', monospace";
+      this.ctx.textAlign = 'left';
+      this.ctx.fillText(p.name, px + 8, py + 16);
+
+      this.ctx.fillStyle = 'rgba(57,255,143,0.5)';
+      this.ctx.font = "5px 'Press Start 2P', monospace";
+      const desc = p.description.length > 30 ? p.description.slice(0, 30) + '...' : p.description;
+      this.ctx.fillText(desc, px + 8, py + 30);
+
+      this.ctx.fillStyle = 'rgba(100,200,255,0.5)';
+      this.ctx.fillText(p.tech.join(', '), px + 8, py + 44);
+
+      this.ctx.fillStyle = '#39ff8f';
+      this.ctx.fillText('GITHUB →', px + 8, py + 60);
+    });
   }
 
   drawSpaceBackground(t: number) {

@@ -24,7 +24,7 @@ export function playBeep(freq = 440, type: OscillatorType = 'square', duration =
       
       osc.start()
       osc.stop(ctx.currentTime + duration)
-  } catch (e) {
+  } catch {
       // Ignore audio errors
   }
 }
@@ -36,4 +36,52 @@ export function playHover() {
 export function playClick() {
     playBeep(1200, 'square', 0.05, 0.05)
     setTimeout(() => playBeep(1800, 'square', 0.1, 0.05), 50)
+}
+
+let engineOsc: OscillatorNode | null = null
+let engineGain: GainNode | null = null
+
+export function startEngine() {
+    const { settings } = useStore.getState()
+    if (!settings.soundEnabled) return
+    if (engineOsc) return
+
+    try {
+        const AudioContext = window.AudioContext || (window as any).webkitAudioContext
+        if (!AudioContext) return
+        
+        const ctx = new AudioContext()
+        engineOsc = ctx.createOscillator()
+        engineGain = ctx.createGain()
+        
+        engineOsc.type = 'sawtooth'
+        engineOsc.frequency.setValueAtTime(80, ctx.currentTime)
+        
+        engineGain.gain.setValueAtTime(0, ctx.currentTime)
+        engineGain.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 0.5)
+        
+        engineOsc.connect(engineGain)
+        engineGain.connect(ctx.destination)
+        
+        engineOsc.start()
+    } catch {
+        // Ignore audio errors
+    }
+}
+
+export function stopEngine() {
+    if (engineOsc && engineGain) {
+        try {
+            const ctx = engineOsc.context
+            engineGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3)
+            setTimeout(() => {
+                engineOsc?.stop()
+                engineOsc = null
+                engineGain = null
+            }, 350)
+        } catch {
+            engineOsc = null
+            engineGain = null
+        }
+    }
 }

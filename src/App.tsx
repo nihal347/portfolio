@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { CanvasSpace } from './canvas/CanvasSpace'
 import { Cockpit } from './components/Cockpit'
+import { Cursor } from './components/Cursor'
 import { useStore } from './store/useStore'
 import { TerminalText } from './components/TerminalText'
 import { Hub } from './pages/Hub'
@@ -15,7 +16,7 @@ import { useKonamiCode } from './hooks/useKonamiCode'
 function BootSequence() {
   const { setView, unlockAchievement } = useStore()
   const [step, setStep] = useState(0)
-  
+
   useEffect(() => {
     const timer1 = setTimeout(() => setStep(1), 1500)
     const timer2 = setTimeout(() => setStep(2), 3000)
@@ -50,7 +51,7 @@ function BootSequence() {
 }
 
 function App() {
-  const { currentView, settings, unlockAchievement, achievements } = useStore()
+  const { currentView, settings, unlockAchievement, achievements, ship } = useStore()
 
   useKonamiCode(() => {
       if (!achievements.konamiCode) {
@@ -72,29 +73,29 @@ function App() {
       return () => clearInterval(interval)
   }, [currentView, addExploration])
 
+  const isTraveling = ship.phase === 'locking' || ship.phase === 'zoomIn' || ship.phase === 'zoomOut'
+
   return (
     <div className="scanlines min-h-screen relative overflow-hidden" style={{ background: 'var(--color-void)', color: 'var(--color-term-green)' }}>
-      {/* Background canvas — z-0 */}
       <CanvasSpace />
 
-      {/* Vignette overlay */}
-      <div className="vignette" />
-      
-      {/* Cockpit — fixed positioned, z-40 */}
       {currentView !== 'boot' && <Cockpit />}
-      
-      {/* Page content — z-20, transparent so planet shows through */}
-      {currentView === 'boot' && !settings.simpleView && <BootSequence />}
-      {currentView === 'hub' && !settings.simpleView && <Hub />}
-      {currentView === 'profile' && !settings.simpleView && <Profile />}
-      {currentView === 'missions' && !settings.simpleView && <Missions />}
-      {currentView === 'comms' && !settings.simpleView && <CommsPanel />}
-      
+
+      {!isTraveling && (
+        <>
+          {currentView === 'boot' && !settings.simpleView && <BootSequence />}
+          {currentView === 'hub' && !settings.simpleView && <Hub />}
+          {currentView === 'profile' && !settings.simpleView && <Profile />}
+          {currentView === 'missions' && !settings.simpleView && <Missions />}
+          {currentView === 'comms' && !settings.simpleView && <CommsPanel />}
+        </>
+      )}
+
       {settings.simpleView && <SimpleView />}
-      
-      {/* Overlays — highest z */}
+
       <TerminalOverlay />
       <Toasts />
+      {currentView !== 'boot' && !settings.simpleView && <Cursor />}
     </div>
   )
 }

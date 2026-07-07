@@ -1,23 +1,14 @@
 import { useState } from 'react'
 import { TerminalText } from './TerminalText'
 import { useStore } from '../store/useStore'
-import { ArrowLeft, Download, Send, Mail, ExternalLink } from 'lucide-react'
+import { Download, Send, Mail, ExternalLink } from 'lucide-react'
 
 export function CommsPanel() {
-  const { setView, setActivePlanet, addExploration, unlockAchievement, achievements } = useStore()
+  const { addExploration, unlockAchievement, achievements } = useStore()
   const [downloading, setDownloading] = useState(false)
   const [downloadStatus, setDownloadStatus] = useState('')
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
   const [formStatus, setFormStatus] = useState('')
-
-  const handleReturn = () => {
-    if ((window as any).__zoomOut) {
-      (window as any).__zoomOut();
-    } else {
-      setActivePlanet(null);
-      setView('hub');
-    }
-  }
 
   const handleDownload = () => {
     setDownloading(true)
@@ -77,19 +68,7 @@ export function CommsPanel() {
 
   return (
     <div className="page-scroll">
-      {/* Top bar */}
-      <div className="fixed top-0 left-0 right-0 z-30 h-11 flex items-center px-5 gap-4" style={{ background: 'linear-gradient(to bottom, rgba(2,3,8,0.95), rgba(2,3,8,0.7), transparent)' }}>
-        <div className="flex items-center gap-2 text-[11px] font-pixel" style={{ color: 'var(--color-magenta)' }}>
-          <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--color-magenta)', boxShadow: '0 0 8px var(--color-magenta)' }} />
-          COMMS RELAY
-        </div>
-        <div className="flex-1" />
-        <div className="text-[10px] font-mono px-2 py-0.5 border" style={{ color: 'rgba(255,61,240,0.5)', borderColor: 'rgba(255,61,240,0.2)' }}>
-          SECTOR // COMM-CLASS
-        </div>
-      </div>
-
-      <div className="max-w-5xl w-full mx-auto space-y-6 animate-fade-in text-left pt-14">
+      <div className="max-w-5xl w-full mx-auto space-y-6 animate-fade-in text-left pt-12">
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
@@ -229,16 +208,6 @@ export function CommsPanel() {
             <ExternalLink size={10} /> GitHub
           </a>
         </div>
-
-        <button 
-          onClick={handleReturn}
-          className="mb-8 flex items-center gap-2 border px-5 py-2.5 transition-all font-bold cursor-pointer"
-          style={{ borderColor: 'rgba(255,61,240,0.5)', color: 'var(--color-magenta)' }}
-          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,61,240,0.15)'; e.currentTarget.style.borderColor = 'var(--color-magenta)'; e.currentTarget.style.boxShadow = '0 0 15px rgba(255,61,240,0.2)' }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(255,61,240,0.5)'; e.currentTarget.style.boxShadow = 'none' }}
-        >
-          <ArrowLeft size={14} /> &lt; RETURN TO ORBIT
-        </button>
       </div>
     </div>
   )

@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import { useStore } from '../store/useStore'
 import { TerminalText } from '../components/TerminalText'
-import { ExternalLink, GitBranch, Clock, Cpu, Bot, Code, Brain, ArrowLeft } from 'lucide-react'
+import { ExternalLink, GitBranch, Clock, Cpu, Bot, Code, Brain } from 'lucide-react'
 
 const PROJECTS = [
   {
@@ -67,18 +66,8 @@ const PROJECTS = [
 ]
 
 export function Missions() {
-  const { setView, setActivePlanet } = useStore()
   const [activeProject, setActiveProject] = useState<string | null>(null)
   const [executing, setExecuting] = useState<string | null>(null)
-
-  const handleReturn = () => {
-    if ((window as any).__zoomOut) {
-      (window as any).__zoomOut();
-    } else {
-      setActivePlanet(null);
-      setView('hub');
-    }
-  }
 
   const handleExecute = (id: string) => {
     setExecuting(id)
@@ -87,19 +76,7 @@ export function Missions() {
 
   return (
     <div className="page-scroll">
-      {/* Top bar */}
-      <div className="fixed top-0 left-0 right-0 z-30 h-11 flex items-center px-5 gap-4" style={{ background: 'linear-gradient(to bottom, rgba(2,3,8,0.95), rgba(2,3,8,0.7), transparent)' }}>
-        <div className="flex items-center gap-2 text-[11px] font-pixel" style={{ color: 'var(--color-jupiter)' }}>
-          <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--color-jupiter)', boxShadow: '0 0 8px var(--color-jupiter)' }} />
-          MISSION LOG
-        </div>
-        <div className="flex-1" />
-        <div className="text-[10px] font-mono px-2 py-0.5 border" style={{ color: 'rgba(196,145,90,0.5)', borderColor: 'rgba(196,145,90,0.2)' }}>
-          SECTOR // GAS-GIANT CLASS
-        </div>
-      </div>
-
-      <div className="max-w-6xl w-full mx-auto space-y-6 animate-fade-in pt-14">
+      <div className="max-w-6xl w-full mx-auto space-y-6 animate-fade-in pt-12">
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             
@@ -173,7 +150,6 @@ export function Missions() {
                                   <span className="text-[9px] font-pixel" style={{ color: 'rgba(196,145,90,0.4)' }}>{project.year}</span>
                                 </div>
                                 
-                                {/* Tech stack */}
                                 <div className="text-[10px] mb-4 pb-3" style={{ borderBottom: '1px solid rgba(196,145,90,0.15)', color: 'rgba(196,145,90,0.5)' }}>
                                   STACK: {project.tech}
                                 </div>
@@ -196,7 +172,6 @@ export function Missions() {
                                             {project.desc}
                                         </p>
                                         
-                                        {/* Difficulty meter */}
                                         <div className="mt-5 pt-3" style={{ borderTop: '1px solid rgba(196,145,90,0.2)' }}>
                                           <div className="text-[9px] font-pixel mb-2" style={{ color: 'rgba(196,145,90,0.5)' }}>DIFFICULTY</div>
                                           <div className="flex gap-1">
@@ -235,16 +210,6 @@ export function Missions() {
             </div>
 
         </div>
-
-        <button 
-          onClick={handleReturn}
-          className="mb-8 flex items-center gap-2 border px-5 py-2.5 transition-all font-bold cursor-pointer"
-          style={{ borderColor: 'rgba(196,145,90,0.5)', color: 'var(--color-jupiter)' }}
-          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(196,145,90,0.15)'; e.currentTarget.style.borderColor = 'var(--color-jupiter)'; e.currentTarget.style.boxShadow = '0 0 15px rgba(196,145,90,0.2)' }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(196,145,90,0.5)'; e.currentTarget.style.boxShadow = 'none' }}
-        >
-          <ArrowLeft size={14} /> &lt; RETURN TO ORBIT
-        </button>
       </div>
     </div>
   )
