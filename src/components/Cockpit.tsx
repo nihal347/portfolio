@@ -25,6 +25,43 @@ const SECTOR_MAP: Record<string, string> = {
   comms: 'COMM-RELAY',
 }
 
+function CtrlBtn({
+  label,
+  active,
+  onClick,
+  tooltip,
+  sub,
+}: {
+  label: string
+  active: boolean
+  onClick: () => void
+  tooltip: string
+  sub?: string
+}) {
+  const [showTip, setShowTip] = useState(false)
+  return (
+    <div className="relative">
+      <button
+        onClick={() => { playClick(); onClick() }}
+        className="fb-square-btn"
+        style={active ? { color: '#39ff8f', borderColor: 'rgba(57,255,143,0.5)', textShadow: '0 0 8px rgba(57,255,143,0.6)' } : { color: '#ff3939', borderColor: 'rgba(255,57,57,0.3)' }}
+        onMouseEnter={() => setShowTip(true)}
+        onMouseLeave={() => setShowTip(false)}
+      >
+        {label}
+        {sub && <span className="block text-[5px] opacity-60 mt-0.5">{sub}</span>}
+      </button>
+      {showTip && (
+        <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 z-[300] pointer-events-none">
+          <div className="bg-[#0a0f1c] border border-[#39ff8f]/30 px-2 py-1 rounded text-[7px] text-[#39ff8f]/70 font-['JetBrains_Mono'] whitespace-nowrap shadow-[0_0_10px_rgba(57,255,143,0.1)]">
+            {tooltip}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function Cockpit() {
   const exploration = useStore(s => s.exploration)
   const toggleSound = useStore(s => s.toggleSound)
@@ -36,20 +73,28 @@ export function Cockpit() {
   const unlockAchievement = useStore(s => s.unlockAchievement)
   const achievements = useStore(s => s.achievements)
   const initiateReturn = useStore(s => s.initiateReturn)
+  const toggleTerminal = useStore(s => s.toggleTerminal)
+  const toggleLogs = useStore(s => s.toggleLogs)
+  const controls = useStore(s => s.controls)
+  const settings = useStore(s => s.settings)
+  const classifiedClicks = useStore(s => s.classifiedClicks)
+  const classifiedUnlocked = useStore(s => s.classifiedUnlocked)
+  const toggleRadar = useStore(s => s.toggleRadar)
+  const toggleTrack = useStore(s => s.toggleTrack)
+  const cycleZoom = useStore(s => s.cycleZoom)
+  const toggleOrbits = useStore(s => s.toggleOrbits)
+  const toggleLabels = useStore(s => s.toggleLabels)
+  const cycleTimeSpeed = useStore(s => s.cycleTimeSpeed)
+  const triggerScan = useStore(s => s.triggerScan)
+  const incrementClassifiedClicks = useStore(s => s.incrementClassifiedClicks)
+  const resetControls = useStore(s => s.resetControls)
 
   const [roleText, setRoleText] = useState('')
   const [roleIndex, setRoleIndex] = useState(0)
   const [isTyping, setIsTyping] = useState(true)
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 })
-  const [btnToggles, setBtnToggles] = useState<Record<string, boolean>>({
-    BTN1: false, BTN2: false, BTN3: false, BTN4: false, SFX: true, BTN6: false,
-    BTN7: false, BTN8: false, BTN9: false, BTN10: false, BTN11: false, BTN12: false,
-  })
+  const [winSize, setWinSize] = useState({ w: window.innerWidth, h: window.innerHeight })
   const currentRole = ROLES[roleIndex]
-
-  const toggleBtn = (id: string) => {
-    setBtnToggles(prev => ({ ...prev, [id]: !prev[id] }))
-  }
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     setMousePos({
@@ -60,7 +105,12 @@ export function Cockpit() {
 
   useEffect(() => {
     window.addEventListener('mousemove', handleMouseMove)
-    return () => window.removeEventListener('mousemove', handleMouseMove)
+    const handleResize = () => setWinSize({ w: window.innerWidth, h: window.innerHeight })
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('resize', handleResize)
+    }
   }, [handleMouseMove])
 
   useEffect(() => {
@@ -86,6 +136,7 @@ export function Cockpit() {
     return () => clearTimeout(timeout)
   }, [roleText, isTyping, currentRole, roleIndex])
 
+  const showViewport = ship.phase === 'idle' || ship.phase === 'zoomOut'
   const isOnPage = currentView !== 'hub' && currentView !== 'boot'
   const isAnimating = ship.phase === 'locking' || ship.phase === 'zoomIn' || ship.phase === 'zoomOut'
   const isReturning = ship.phase === 'zoomOut'
@@ -94,6 +145,11 @@ export function Cockpit() {
   const shield = Math.round(Math.min(100, 60 + exploration * 0.4))
   const reactor = Math.round(Math.min(100, 70 + exploration * 0.3))
   const targetSector = activePlanet ? SECTOR_MAP[activePlanet] : SECTOR_MAP[currentView] || 'UNKNOWN'
+
+  const handleClassified = () => {
+    playClick()
+    incrementClassifiedClicks()
+  }
 
   return (
     <>
@@ -143,59 +199,30 @@ export function Cockpit() {
       <div className="cockpit-hex-edge cockpit-hex-edge--left" />
       <div className="cockpit-hex-edge cockpit-hex-edge--right" />
 
-      <div className="fixed inset-0 z-40 pointer-events-none">
+      <div className="fixed inset-0 z-40 pointer-events-none" style={{ transform: `translate(${(mousePos.x - 0.5) * -12}px, ${(mousePos.y - 0.5) * -12}px)`, transition: 'transform 0.1s ease-out' }}>
         {/* ═══ HEADER ═══ */}
         <div className="absolute top-0 left-0 right-0 h-8 flex items-center justify-center z-10" style={{
-          background: 'linear-gradient(to bottom, rgba(2,3,8,0.8), transparent)',
+          background: 'linear-gradient(to bottom, rgba(2,3,8,0.9), transparent)',
         }}>
-          <p className="fb-text tracking-[0.3em]" style={{ fontSize: '10px', opacity: isOnPage ? 0.4 : 1, transition: 'opacity 0.5s' }}>
-            // WELCOME ABOARD / {roleText}
-            <span className="animate-blink ml-0.5 inline-block w-[4px] h-[7px] align-[-1px]" style={{ background: '#39ff8f' }} />
-          </p>
+          <div className="font-pixel text-[9px] tracking-[0.25em] text-[#39ff8f]/80">
+            // WELCOME ABOARD / <span className="text-[#39ff8f]">{roleText}</span>
+            <span className="animate-cursor-blink inline-block w-[5px] h-[8px] ml-[2px] align-[-1px]" style={{ background: '#39ff8f' }} />
+          </div>
         </div>
 
-        {/* ═══ CENTER — targeting square + corner lines ═══ */}
-        <div className="absolute inset-0" style={{ 
-          opacity: isOnPage && !isAnimating ? 0 : 0.15,
-          transition: 'opacity 0.4s ease-out',
-        }}>
-          <svg className="w-full h-full" viewBox="0 0 1000 600" preserveAspectRatio="none">
-            {(() => {
-              const offsetX = (mousePos.x - 0.5) * 40
-              const offsetY = (mousePos.y - 0.5) * 40
-              const cx = 500 + offsetX
-              const cy = 300 + offsetY
-              const s = 40
-              return (
-                <>
-                  <rect x={cx - s} y={cy - s} width={s * 2} height={s * 2} stroke="#39ff8f" strokeWidth="1" fill="none" />
-                  <rect x={cx - s + 5} y={cy - s + 5} width={s * 2 - 10} height={s * 2 - 10} stroke="#39ff8f" strokeWidth="0.5" fill="none" opacity="0.5" />
-                  <line x1={cx - s} y1={cy - s} x2="0" y2="0" stroke="#39ff8f" strokeWidth="0.5" />
-                  <line x1={cx + s} y1={cy - s} x2="1000" y2="0" stroke="#39ff8f" strokeWidth="0.5" />
-                  <line x1={cx - s} y1={cy + s} x2="0" y2="600" stroke="#39ff8f" strokeWidth="0.5" />
-                  <line x1={cx + s} y1={cy + s} x2="1000" y2="600" stroke="#39ff8f" strokeWidth="0.5" />
-                  <line x1={cx} y1={cy - s - 10} x2={cx} y2={cy + s + 10} stroke="#39ff8f" strokeWidth="0.5" opacity="0.6" />
-                  <line x1={cx - s - 10} y1={cy} x2={cx + s + 10} y2={cy} stroke="#39ff8f" strokeWidth="0.5" opacity="0.6" />
-                  <circle cx={cx} cy={cy} r="3" fill="#39ff8f" opacity="0.6" />
-                </>
-              )
-            })()}
-          </svg>
-        </div>
-
-        {/* ═══ TOP LEFT — ship status ═══ */}
-        <div className="floating-box absolute top-4 left-4" style={{ minWidth: '140px' }}>
+        {/* ═══ TOP LEFT — SHIP STATUS ═══ */}
+        <div className="floating-box absolute top-12 left-4" style={{ minWidth: '150px' }}>
           <div className="fb-title">SHIP STATUS</div>
-          <div className="fb-row"><span>SHD</span><span>{shield}%</span></div>
+          <div className="fb-row"><span>HULL</span><span className="text-[#39ff8f]">100%</span></div>
+          <div className="fb-bar"><div className="fb-bar-fill" style={{ width: '100%' }} /></div>
+          <div className="fb-row"><span>SHIELDS</span><span>{shield}%</span></div>
           <div className="fb-bar"><div className="fb-bar-fill" style={{ width: `${shield}%` }} /></div>
-          <div className="fb-row"><span>PWR</span><span>88%</span></div>
-          <div className="fb-bar"><div className="fb-bar-fill" style={{ width: '88%' }} /></div>
-          <div className="fb-row"><span>RCT</span><span>{reactor}%</span></div>
+          <div className="fb-row"><span>REACTOR</span><span>{reactor}%</span></div>
           <div className="fb-bar"><div className="fb-bar-fill" style={{ width: `${reactor}%` }} /></div>
         </div>
 
-        {/* ═══ TOP RIGHT — sector ═══ */}
-        <div className="floating-box absolute top-4 right-4 text-right" style={{ minWidth: '140px' }}>
+        {/* ═══ TOP RIGHT — SECTOR ═══ */}
+        <div className="floating-box absolute top-12 right-4" style={{ minWidth: '150px' }}>
           <div className="fb-title">SECTOR</div>
           <div className="fb-big">{targetSector}</div>
           <div className="fb-row"><span>SYS LOAD</span><span>{Math.round(exploration)}%</span></div>
@@ -203,35 +230,26 @@ export function Cockpit() {
         </div>
 
         {/* ═══ LEFT — button bank ═══ */}
-        <div className="absolute top-1/2 left-[8%] -translate-y-1/2 pointer-events-auto">
-          <div className="flex flex-col items-center gap-1.5">
-            <div className="flex gap-1.5">
-              {['BTN1', 'BTN2', 'BTN3'].map(btn => (
-                <button key={btn} onClick={() => { playClick(); toggleBtn(btn) }} className="fb-square-btn" style={btnToggles[btn] === false ? { color: '#ff3939', borderColor: 'rgba(255,57,57,0.4)' } : undefined}>{btn}</button>
-              ))}
-            </div>
-            <div className="flex gap-1.5">
-              <button onClick={() => { playClick(); toggleBtn('BTN4') }} className="fb-square-btn" style={btnToggles['BTN4'] === false ? { color: '#ff3939', borderColor: 'rgba(255,57,57,0.4)' } : undefined}>BTN4</button>
-              <button onClick={() => { playClick(); toggleBtn('SFX'); toggleSound() }} className="fb-square-btn" style={btnToggles['SFX'] === false ? { color: '#ff3939', borderColor: 'rgba(255,57,57,0.4)' } : undefined}>SFX</button>
-            </div>
-            <button onClick={() => { playClick(); toggleBtn('BTN6') }} className="fb-square-btn" style={btnToggles['BTN6'] === false ? { color: '#ff3939', borderColor: 'rgba(255,57,57,0.4)' } : undefined}>BTN6</button>
+        <div className="absolute top-1/2 left-[6%] -translate-y-1/2 pointer-events-auto">
+          <div className="flex flex-col items-center gap-1">
+            <CtrlBtn label="SFX" active={settings.soundEnabled} onClick={toggleSound} tooltip="Toggle interface sounds" sub={settings.soundEnabled ? 'ON' : 'OFF'} />
+            <CtrlBtn label="SCAN" active={controls.scanActive} onClick={triggerScan} tooltip="Initiate solar system scan" />
+            <CtrlBtn label="RADAR" active={controls.radar} onClick={toggleRadar} tooltip="Toggle radar sweep" sub={controls.radar ? 'ACTIVE' : 'OFFLINE'} />
+            <CtrlBtn label="TRACK" active={controls.track} onClick={toggleTrack} tooltip="Camera follows planets" sub={controls.track ? 'ENABLED' : 'DISABLED'} />
+            <CtrlBtn label="ZOOM" active={controls.zoom !== 1} onClick={cycleZoom} tooltip="Cycle zoom level" sub={`${Math.round(controls.zoom * 100)}%`} />
+            <CtrlBtn label="ORBITS" active={controls.orbits} onClick={toggleOrbits} tooltip="Toggle orbit ring guides" />
           </div>
         </div>
 
         {/* ═══ RIGHT — button bank ═══ */}
-        <div className="absolute top-1/2 right-[8%] -translate-y-1/2 pointer-events-auto">
-          <div className="flex flex-col items-center gap-1.5">
-            <div className="flex gap-1.5">
-              {['BTN7', 'BTN8', 'BTN9'].map(btn => (
-                <button key={btn} onClick={() => { playClick(); toggleBtn(btn) }} className="fb-square-btn" style={btnToggles[btn] === false ? { color: '#ff3939', borderColor: 'rgba(255,57,57,0.4)' } : undefined}>{btn}</button>
-              ))}
-            </div>
-            <div className="flex gap-1.5">
-              {['BTN10', 'BTN11'].map(btn => (
-                <button key={btn} onClick={() => { playClick(); toggleBtn(btn) }} className="fb-square-btn" style={btnToggles[btn] === false ? { color: '#ff3939', borderColor: 'rgba(255,57,57,0.4)' } : undefined}>{btn}</button>
-              ))}
-            </div>
-            <button onClick={() => { playClick(); toggleBtn('BTN12') }} className="fb-square-btn" style={btnToggles['BTN12'] === false ? { color: '#ff3939', borderColor: 'rgba(255,57,57,0.4)' } : undefined}>BTN12</button>
+        <div className="absolute top-1/2 right-[6%] -translate-y-1/2 pointer-events-auto">
+          <div className="flex flex-col items-center gap-1">
+            <CtrlBtn label="TERMINAL" active={false} onClick={toggleTerminal} tooltip="Open command terminal" />
+            <CtrlBtn label="TIME" active={controls.timeSpeed !== 1} onClick={cycleTimeSpeed} tooltip="Cycle simulation speed" sub={`${controls.timeSpeed}x`} />
+            <CtrlBtn label="LABELS" active={controls.labels} onClick={toggleLabels} tooltip="Toggle planet labels" />
+            <CtrlBtn label="RESET" active={false} onClick={resetControls} tooltip="Reset simulation defaults" />
+            <CtrlBtn label="LOGS" active={false} onClick={toggleLogs} tooltip="Open system log panel" />
+            <CtrlBtn label="CLASSIFIED" active={classifiedUnlocked} onClick={handleClassified} tooltip={classifiedUnlocked ? 'CLASSIFIED MODE ACTIVE' : classifiedClicks > 0 ? `Access level: ${classifiedClicks}/5` : '???'} />
           </div>
         </div>
 
@@ -291,46 +309,46 @@ export function Cockpit() {
                   boxShadow: '0 0 8px #39ff8f',
                   animation: 'cockpit-scan 1s ease-in-out infinite',
                 }} />
-        </div>
-
-        {/* ═══ CENTER — targeting square + corner lines ═══ */}
-        <div className="absolute inset-0" style={{ 
-          opacity: isOnPage ? 0 : 0.15,
-          transform: isOnPage ? 'scale(0.5)' : 'scale(1)',
-          transition: 'opacity 0.4s ease-out, transform 0.4s ease-out',
-          transformOrigin: 'center center'
-        }}>
-          <svg className="w-full h-full" viewBox="0 0 1000 600" preserveAspectRatio="none">
-            {/* Center square */}
-            <rect x="460" y="260" width="80" height="80" 
-              stroke="#39ff8f" strokeWidth="1" fill="none" />
-            <rect x="465" y="265" width="70" height="70" 
-              stroke="#39ff8f" strokeWidth="0.5" fill="none" opacity="0.5" />
-            
-            {/* Lines to corners */}
-            <line x1="460" y1="260" x2="0" y2="0" 
-              stroke="#39ff8f" strokeWidth="0.5" />
-            <line x1="540" y1="260" x2="1000" y2="0" 
-              stroke="#39ff8f" strokeWidth="0.5" />
-            <line x1="460" y1="340" x2="0" y2="600" 
-              stroke="#39ff8f" strokeWidth="0.5" />
-            <line x1="540" y1="340" x2="1000" y2="600" 
-              stroke="#39ff8f" strokeWidth="0.5" />
-            
-            {/* Center crosshair */}
-            <line x1="500" y1="210" x2="500" y2="390" 
-              stroke="#39ff8f" strokeWidth="0.5" opacity="0.6" />
-            <line x1="410" y1="300" x2="590" y2="300" 
-              stroke="#39ff8f" strokeWidth="0.5" opacity="0.6" />
-            
-            {/* Center dot */}
-            <circle cx="500" cy="300" r="3" fill="#39ff8f" opacity="0.6" />
-          </svg>
-        </div>
-
+              </div>
             </div>
           </div>
         )}
+
+      </div>
+
+      {/* ═══ COCKPIT VIEWPORT ═══ */}
+      <div className="fixed inset-0 z-30 pointer-events-none" style={{
+        opacity: showViewport ? 1 : 0,
+        transform: showViewport ? 'scale(1)' : 'scale(3)',
+        transition: 'opacity 0.8s ease-in-out, transform 0.8s ease-in-out'
+      }}>
+        <div className="absolute inset-0" style={{ transform: `translate(${(mousePos.x - 0.5) * -15}px, ${(mousePos.y - 0.5) * -15}px)`, transition: 'transform 0.1s ease-out' }}>
+          {(() => {
+            const ox = (mousePos.x - 0.5) * 15
+            const oy = (mousePos.y - 0.5) * 15
+            const cx = winSize.w / 2 + ox
+            const cy = winSize.h / 2 + oy
+            const half = 110
+            const tl = { x: cx - half, y: cy - half }
+            const tr = { x: cx + half, y: cy - half }
+            const bl = { x: cx - half, y: cy + half }
+            const br = { x: cx + half, y: cy + half }
+            return (
+              <svg className="absolute inset-0 w-full h-full" viewBox={`0 0 ${winSize.w} ${winSize.h}`} preserveAspectRatio="none">
+                <line x1="0" y1="0" x2={tl.x} y2={tl.y} stroke="#39ff8f" strokeWidth="1" opacity="0.3" />
+                <line x1={winSize.w} y1="0" x2={tr.x} y2={tr.y} stroke="#39ff8f" strokeWidth="1" opacity="0.3" />
+                <line x1="0" y1={winSize.h} x2={bl.x} y2={bl.y} stroke="#39ff8f" strokeWidth="1" opacity="0.3" />
+                <line x1={winSize.w} y1={winSize.h} x2={br.x} y2={br.y} stroke="#39ff8f" strokeWidth="1" opacity="0.3" />
+              </svg>
+            )
+          })()}
+          <div className="absolute left-1/2 top-1/2 w-[220px] h-[220px] -translate-x-1/2 -translate-y-1/2 border border-[#39ff8f]/30">
+            <div className="absolute -top-[1px] -left-[1px] w-3 h-3 border-t-2 border-l-2 border-[#39ff8f]/60" />
+            <div className="absolute -top-[1px] -right-[1px] w-3 h-3 border-t-2 border-r-2 border-[#39ff8f]/60" />
+            <div className="absolute -bottom-[1px] -left-[1px] w-3 h-3 border-b-2 border-l-2 border-[#39ff8f]/60" />
+            <div className="absolute -bottom-[1px] -right-[1px] w-3 h-3 border-b-2 border-r-2 border-[#39ff8f]/60" />
+          </div>
+        </div>
       </div>
     </>
   )

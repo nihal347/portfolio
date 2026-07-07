@@ -10,6 +10,8 @@ import { Missions } from './pages/Missions'
 import { CommsPanel } from './components/CommsPanel'
 import { SimpleView } from './pages/SimpleView'
 import { TerminalOverlay } from './components/TerminalOverlay'
+import Terminal from './components/Terminal'
+import { SystemLog } from './components/SystemLog'
 import { Toasts } from './components/Toasts'
 import { useKonamiCode } from './hooks/useKonamiCode'
 
@@ -94,6 +96,8 @@ function App() {
       {settings.simpleView && <SimpleView />}
 
       <TerminalOverlay />
+      <Terminal />
+      <SystemLog />
       <Toasts />
       {currentView !== 'boot' && !settings.simpleView && <Cursor />}
     </div>

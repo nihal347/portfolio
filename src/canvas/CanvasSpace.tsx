@@ -48,6 +48,11 @@ export function CanvasSpace() {
         state.initiateTravel(b.name as any);
       }
     });
+
+    // Check project card click
+    if (state.activePlanet === 'projects' && engine.hoveredProjectIndex >= 0) {
+      engine.openProjectLink();
+    }
   }, []);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
@@ -82,13 +87,22 @@ export function CanvasSpace() {
     window.addEventListener('mousemove', handleMouseMove);
     canvas.addEventListener('click', handleClick);
 
+    const handleWheel = (e: WheelEvent) => {
+      const { activePlanet } = useStore.getState();
+      if (activePlanet === 'projects') {
+        e.preventDefault();
+        engine.projectScrollY += e.deltaY * 0.5;
+      }
+    };
+    canvas.addEventListener('wheel', handleWheel, { passive: false });
+
     let lastTime = performance.now();
 
     const loop = (time: number) => {
       const dt = Math.min((time - lastTime) / 1000, 0.05);
       lastTime = time;
 
-      const { ship: s, activePlanet: ap } = useStore.getState();
+      const { ship: s, activePlanet: ap, controls } = useStore.getState();
 
       if (s.target) lastPlanetRef.current = s.target;
       if (ap) lastPlanetRef.current = ap;
@@ -129,9 +143,12 @@ export function CanvasSpace() {
             labelAlpha = 1 - progress * 0.5;
 
             if (progress >= 1) {
-              startEngine();
-              useStore.getState().pushLog('sys: trajectory locked');
-              useStore.setState({ ship: { ...s, phase: 'zoomIn', startTime: time } });
+              const cur = useStore.getState().ship;
+              if (cur.phase === 'locking') {
+                startEngine();
+                useStore.getState().pushLog('sys: trajectory locked');
+                useStore.setState({ ship: { ...cur, phase: 'zoomIn', startTime: time } });
+              }
             }
 
           } else if (s.phase === 'zoomIn') {
@@ -147,10 +164,13 @@ export function CanvasSpace() {
             labelAlpha = Math.max(0, 0.5 - ease * 0.5);
 
             if (progress >= 1) {
-              stopEngine();
-              flashAlpha = 0.3;
-              useStore.getState().arrive();
-              playBeep(600, 'sine', 0.15, 0.08);
+              const cur = useStore.getState().ship;
+              if (cur.phase === 'zoomIn') {
+                stopEngine();
+                flashAlpha = 0.3;
+                useStore.getState().arrive();
+                playBeep(600, 'sine', 0.15, 0.08);
+              }
             }
 
           } else if (s.phase === 'zoomOut') {
@@ -172,8 +192,11 @@ export function CanvasSpace() {
             flashAlpha = Math.max(0, 0.25 - progress * 0.3);
 
             if (progress >= 1) {
-              stopEngine();
-              useStore.getState().finishReturn();
+              const cur = useStore.getState().ship;
+              if (cur.phase === 'zoomOut') {
+                stopEngine();
+                useStore.getState().finishReturn();
+              }
             }
           }
 
@@ -183,7 +206,7 @@ export function CanvasSpace() {
           ctx.translate(-camX, -camY);
 
           engine.update(dt);
-          engine.draw(time, labelAlpha > 0.05);
+          engine.draw(time, labelAlpha > 0.05, controls.orbits, controls.radar);
           ctx.restore();
 
           if (starStreak > 0.01) {
@@ -237,10 +260,18 @@ export function CanvasSpace() {
 
         } else if (ap) {
           engine.update(dt);
-          engine.drawZoomedPlanet(ap, time, 1);
+          if (ap === 'techstack') {
+            engine.drawTechStackZoomed(time);
+          } else if (ap === 'projects') {
+            engine.drawProjectsZoomed(time);
+          } else if (ap === 'learning') {
+            engine.drawLearningZoomed(time);
+          } else {
+            engine.drawZoomedPlanet(ap, time, 1);
+          }
         } else {
           engine.update(dt);
-          engine.draw(time);
+          engine.draw(time, controls.labels, controls.orbits, controls.radar);
         }
       }
 
@@ -253,6 +284,7 @@ export function CanvasSpace() {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);
       canvas.removeEventListener('click', handleClick);
+      canvas.removeEventListener('wheel', handleWheel);
       cancelAnimationFrame(animRef.current);
     };
   }, [settings.simpleView, handleClick, handleMouseMove]);

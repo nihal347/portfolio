@@ -62,6 +62,13 @@ export interface Project {
   tags: string[];
 }
 
+export interface LearningItem {
+  name: string
+  category: string
+  progress: number
+  description: string
+}
+
 export class SpaceEngine {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
@@ -69,10 +76,14 @@ export class SpaceEngine {
   asteroids: Asteroid[] = [];
   satellites: Satellite[] = [];
   projects: Project[] = [];
+  learningItems: LearningItem[] = [];
   hoveredSatellite: Satellite | null = null;
   hoveredAsteroid: Asteroid | null = null;
+  hoveredProjectIndex: number = -1;
   stars: {x: number, y: number, layer: number, brightness: number}[] = [];
   nebulaClouds: {x: number, y: number, radius: number, color: string, opacity: number}[] = [];
+  scrollY = 0;
+  projectScrollY = 0;
   
   MU = 200000;
   cx = 0;
@@ -319,11 +330,33 @@ export class SpaceEngine {
         tags: ['Web', 'React', 'TypeScript']
       },
     ];
+
+    this.learningItems = [
+      { name: 'RUST', category: 'LANGUAGES', progress: 30, description: 'Systems programming, memory safety' },
+      { name: 'WEBASSEMBLY', category: 'COMPILER', progress: 20, description: 'Browser-native fast execution' },
+      { name: 'KUBERNETES', category: 'DEVOPS', progress: 45, description: 'Container orchestration at scale' },
+      { name: 'THREE.JS', category: 'GRAPHICS', progress: 55, description: '3D rendering in the browser' },
+      { name: 'NEURAL NETWORKS', category: 'AI/ML', progress: 70, description: 'Deep learning architectures' },
+      { name: 'REINFORCEMENT LEARNING', category: 'AI/ML', progress: 40, description: 'Agent-based learning systems' },
+      { name: 'GO', category: 'LANGUAGES', progress: 35, description: 'Concurrent backend services' },
+      { name: 'ASTRO', category: 'WEB', progress: 60, description: 'Static-first web framework' },
+      { name: 'EDGE COMPUTING', category: 'INFRA', progress: 25, description: 'Distributed edge deployment' },
+      { name: 'QUANTUM COMPUTING', category: '前沿', progress: 15, description: 'Qubits and quantum gates' },
+      { name: 'COMPUTER VISION', category: 'AI/ML', progress: 65, description: 'Image recognition and detection' },
+      { name: 'NLP', category: 'AI/ML', progress: 75, description: 'Natural language processing' },
+    ];
   }
   
   resize() {
       this.cx = this.canvas.width / 2;
       this.cy = this.canvas.height / 2;
+  }
+
+  openProjectLink() {
+    if (this.hoveredProjectIndex >= 0 && this.hoveredProjectIndex < this.projects.length) {
+      const project = this.projects[this.hoveredProjectIndex];
+      window.open(project.github, '_blank', 'noopener,noreferrer');
+    }
   }
 
   circularBody(r: number, theta0: number, opts: any): Body {
@@ -381,7 +414,7 @@ export class SpaceEngine {
     });
   }
 
-  draw(t: number, drawLabels = true) {
+  draw(t: number, drawLabels = true, showOrbits = true, radarActive = false) {
     const W = this.canvas.width;
     const H = this.canvas.height;
     
@@ -395,22 +428,20 @@ export class SpaceEngine {
 
     // Nebula clouds for depth
     this.nebulaClouds.forEach(cloud => {
-      const parallaxX = cloud.x + (this.mouseX - this.cx) * 0.01;
-      const parallaxY = cloud.y + (this.mouseY - this.cy) * 0.01;
-      const grad = this.ctx.createRadialGradient(parallaxX, parallaxY, 0, parallaxX, parallaxY, cloud.radius);
+      const grad = this.ctx.createRadialGradient(cloud.x, cloud.y, 0, cloud.x, cloud.y, cloud.radius);
       grad.addColorStop(0, cloud.color + cloud.opacity + ')');
       grad.addColorStop(1, cloud.color + '0)');
       this.ctx.fillStyle = grad;
       this.ctx.beginPath();
-      this.ctx.arc(parallaxX, parallaxY, cloud.radius, 0, Math.PI * 2);
+      this.ctx.arc(cloud.x, cloud.y, cloud.radius, 0, Math.PI * 2);
       this.ctx.fill();
     });
 
     // Stars with twinkling effect
     this.stars.forEach(s => {
       const layer = this.layers[s.layer];
-      let px = (s.x + (this.mouseX - this.cx)*layer.speed*-1) % W;
-      let py = (s.y + (this.mouseY - this.cy)*layer.speed*-1) % H;
+      let px = s.x % W;
+      let py = s.y % H;
       if(px<0) px+=W; if(py<0) py+=H;
       
       // Twinkle effect
@@ -466,27 +497,70 @@ export class SpaceEngine {
     this.ctx.fillRect(this.cx - 2, this.cy - 3, 2, 2);
     this.ctx.fillRect(this.cx + 2, this.cy + 1, 2, 2);
 
-    // Orbit rings with depth effect
-    [70, 120, 175, 230, 320, 400].forEach((r, i) => {
-      // Orbit path
-      this.ctx.strokeStyle = `rgba(100,120,150,${0.15 - i * 0.03})`;
-      this.ctx.lineWidth = 1;
-      this.ctx.setLineDash([4, 8]);
-      this.ctx.beginPath();
-      this.ctx.arc(this.cx, this.cy, r, 0, Math.PI*2);
-      this.ctx.stroke();
-      this.ctx.setLineDash([]);
+    // Radar sweep
+    if (radarActive) {
+      const radarAngle = (t / 1200) % (Math.PI * 2);
+      const maxR = Math.max(W, H) * 0.6;
       
-      // Orbit glow
-      const orbitGrad = this.ctx.createRadialGradient(this.cx, this.cy, r - 2, this.cx, this.cy, r + 2);
-      orbitGrad.addColorStop(0, 'rgba(100,150,200,0)');
-      orbitGrad.addColorStop(0.5, 'rgba(100,150,200,0.05)');
-      orbitGrad.addColorStop(1, 'rgba(100,150,200,0)');
-      this.ctx.fillStyle = orbitGrad;
+      // Radar sweep line
+      const sweepGrad = this.ctx.createLinearGradient(this.cx, this.cy, this.cx + maxR * Math.cos(radarAngle), this.cy + maxR * Math.sin(radarAngle));
+      sweepGrad.addColorStop(0, 'rgba(57,255,143,0.3)');
+      sweepGrad.addColorStop(1, 'rgba(57,255,143,0)');
+      this.ctx.strokeStyle = sweepGrad;
+      this.ctx.lineWidth = 1;
       this.ctx.beginPath();
-      this.ctx.arc(this.cx, this.cy, r + 2, 0, Math.PI*2);
+      this.ctx.moveTo(this.cx, this.cy);
+      this.ctx.lineTo(this.cx + maxR * Math.cos(radarAngle), this.cy + maxR * Math.sin(radarAngle));
+      this.ctx.stroke();
+      
+      // Radar sweep arc (trail) - very subtle
+      this.ctx.fillStyle = 'rgba(57,255,143,0.02)';
+      this.ctx.beginPath();
+      this.ctx.moveTo(this.cx, this.cy);
+      this.ctx.arc(this.cx, this.cy, maxR, radarAngle - 0.3, radarAngle, false);
+      this.ctx.closePath();
       this.ctx.fill();
-    });
+      
+      // Highlight planets as sweep passes
+      this.bodies.forEach(b => {
+        const angle = Math.atan2(b.y - this.cy, b.x - this.cx);
+        const angleDiff = Math.abs(((angle - radarAngle + Math.PI) % (Math.PI * 2)) - Math.PI);
+        if (angleDiff < 0.2) {
+          this.ctx.shadowBlur = 8;
+          this.ctx.shadowColor = '#39ff8f';
+          this.ctx.strokeStyle = 'rgba(57,255,143,0.4)';
+          this.ctx.lineWidth = 1;
+          this.ctx.beginPath();
+          this.ctx.arc(b.x, b.y, b.radius + 3, 0, Math.PI * 2);
+          this.ctx.stroke();
+          this.ctx.shadowBlur = 0;
+        }
+      });
+    }
+
+    // Orbit rings with depth effect
+    if (showOrbits) {
+      [70, 120, 175, 230, 320, 400].forEach((r, i) => {
+        // Orbit path
+        this.ctx.strokeStyle = `rgba(100,120,150,${0.15 - i * 0.03})`;
+        this.ctx.lineWidth = 1;
+        this.ctx.setLineDash([4, 8]);
+        this.ctx.beginPath();
+        this.ctx.arc(this.cx, this.cy, r, 0, Math.PI*2);
+        this.ctx.stroke();
+        this.ctx.setLineDash([]);
+        
+        // Orbit glow
+        const orbitGrad = this.ctx.createRadialGradient(this.cx, this.cy, r - 2, this.cx, this.cy, r + 2);
+        orbitGrad.addColorStop(0, 'rgba(100,150,200,0)');
+        orbitGrad.addColorStop(0.5, 'rgba(100,150,200,0.05)');
+        orbitGrad.addColorStop(1, 'rgba(100,150,200,0)');
+        this.ctx.fillStyle = orbitGrad;
+        this.ctx.beginPath();
+        this.ctx.arc(this.cx, this.cy, r + 2, 0, Math.PI*2);
+        this.ctx.fill();
+      });
+    }
 
     // Bodies - 3D planets with shading
     this.bodies.forEach(b => {
@@ -692,8 +766,9 @@ export class SpaceEngine {
     });
 
     // Info panel for hovered satellite
-    if (this.hoveredSatellite) {
-      const s = this.hoveredSatellite;
+    const hoveredSat = this.satellites.find(s => s.hover);
+    if (hoveredSat) {
+      const s = hoveredSat;
       const px = cx + 120;
       const py = cy - 80;
       const pw = 200;
@@ -749,64 +824,127 @@ export class SpaceEngine {
     this.ctx.fillStyle = bgGrad;
     this.ctx.fillRect(0, 0, W, H);
 
-    // Planet
+    // Planet (centered top)
     const pulse = 1 + Math.sin(t / 600) * 0.03;
-    const planetR = 45 * pulse;
-    const planetGrad = this.ctx.createRadialGradient(cx - 12, cy - 12, 0, cx, cy, planetR);
+    const planetR = 25 * pulse;
+    const px = W / 2;
+    const py = 45;
+    const planetGrad = this.ctx.createRadialGradient(px - 8, py - 8, 0, px, py, planetR);
     planetGrad.addColorStop(0, '#4aa86a');
     planetGrad.addColorStop(0.5, '#2a6b3a');
     planetGrad.addColorStop(1, '#1a3a25');
     this.ctx.fillStyle = planetGrad;
     this.ctx.beginPath();
-    this.ctx.arc(cx, cy, planetR, 0, Math.PI * 2);
+    this.ctx.arc(px, py, planetR, 0, Math.PI * 2);
     this.ctx.fill();
 
     // Planet glow
-    this.ctx.shadowBlur = 25;
+    this.ctx.shadowBlur = 20;
     this.ctx.shadowColor = '#2a6b3a';
     this.ctx.strokeStyle = 'rgba(42,107,58,0.3)';
     this.ctx.lineWidth = 2;
     this.ctx.beginPath();
-    this.ctx.arc(cx, cy, planetR + 5, 0, Math.PI * 2);
+    this.ctx.arc(px, py, planetR + 4, 0, Math.PI * 2);
     this.ctx.stroke();
     this.ctx.shadowBlur = 0;
 
-    // Project cards around planet
-    const cardW = 140;
-    const cardH = 70;
-    const startX = cx - 220;
-    const startY = cy - 120;
+    // Title
+    this.ctx.fillStyle = '#39ff8f';
+    this.ctx.font = "bold 10px 'Press Start 2P', monospace";
+    this.ctx.textAlign = 'center';
+    this.ctx.fillText('// PROJECTS LOG', W / 2, 30);
+    this.ctx.fillStyle = 'rgba(57,255,143,0.5)';
+    this.ctx.font = "6px 'Press Start 2P', monospace";
+    this.ctx.fillText(`TOTAL: ${this.projects.length} MISSIONS`, W / 2, 88);
+    this.ctx.textAlign = 'left';
 
+    // Scrollable project cards
+    const cardW = 280;
+    const cardH = 90;
+    const gap = 12;
+    const cols = 3;
+    const totalGridW = cols * cardW + (cols - 1) * gap;
+    const startX = (W - totalGridW) / 2;
+    const startY = 100;
+    const totalRows = Math.ceil(this.projects.length / cols);
+    const totalContentH = totalRows * (cardH + gap);
+    const visibleH = H - 110;
+
+    // Clamp scroll
+    const maxScroll = Math.max(0, totalContentH - visibleH);
+    this.projectScrollY = Math.max(0, Math.min(this.projectScrollY, maxScroll));
+
+    // Clip scrollable area
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.rect(20, 95, W - 40, visibleH + 10);
+    this.ctx.clip();
+
+    this.hoveredProjectIndex = -1;
     this.projects.forEach((p, i) => {
-      const col = i % 3;
-      const row = Math.floor(i / 3);
-      const px = startX + col * (cardW + 15);
-      const py = startY + row * (cardH + 15);
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const cardX = startX + col * (cardW + gap);
+      const cardY = startY + row * (cardH + gap) - this.projectScrollY;
 
-      this.ctx.fillStyle = 'rgba(2,3,8,0.85)';
-      this.ctx.strokeStyle = 'rgba(57,255,143,0.3)';
+      // Skip if off screen
+      if (cardY + cardH < 95 || cardY > H) return;
+
+      // Check hover
+      const isHovered = this.mouseX >= cardX && this.mouseX <= cardX + cardW &&
+                        this.mouseY >= cardY && this.mouseY <= cardY + cardH;
+      if (isHovered) this.hoveredProjectIndex = i;
+
+      // Card background
+      this.ctx.fillStyle = isHovered ? 'rgba(57,255,143,0.1)' : 'rgba(2,3,8,0.9)';
+      this.ctx.strokeStyle = isHovered ? '#39ff8f' : 'rgba(57,255,143,0.4)';
       this.ctx.lineWidth = 1;
       this.ctx.beginPath();
-      this.ctx.roundRect(px, py, cardW, cardH, 3);
+      this.ctx.roundRect(cardX, cardY, cardW, cardH, 4);
       this.ctx.fill();
       this.ctx.stroke();
 
+      // Project name
       this.ctx.fillStyle = '#39ff8f';
-      this.ctx.font = "bold 7px 'Press Start 2P', monospace";
+      this.ctx.font = "bold 9px 'Press Start 2P', monospace";
       this.ctx.textAlign = 'left';
-      this.ctx.fillText(p.name, px + 8, py + 16);
+      this.ctx.fillText(p.name, cardX + 12, cardY + 22);
 
-      this.ctx.fillStyle = 'rgba(57,255,143,0.5)';
+      // Description
+      this.ctx.fillStyle = 'rgba(57,255,143,0.6)';
+      this.ctx.font = "6px 'Press Start 2P', monospace";
+      const desc = p.description.length > 40 ? p.description.slice(0, 40) + '...' : p.description;
+      this.ctx.fillText(desc, cardX + 12, cardY + 40);
+
+      // Tech tags
+      this.ctx.fillStyle = 'rgba(100,200,255,0.6)';
       this.ctx.font = "5px 'Press Start 2P', monospace";
-      const desc = p.description.length > 30 ? p.description.slice(0, 30) + '...' : p.description;
-      this.ctx.fillText(desc, px + 8, py + 30);
+      this.ctx.fillText(p.tech.join(' • '), cardX + 12, cardY + 56);
 
-      this.ctx.fillStyle = 'rgba(100,200,255,0.5)';
-      this.ctx.fillText(p.tech.join(', '), px + 8, py + 44);
-
+      // GitHub link
       this.ctx.fillStyle = '#39ff8f';
-      this.ctx.fillText('GITHUB →', px + 8, py + 60);
+      this.ctx.font = "bold 6px 'Press Start 2P', monospace";
+      this.ctx.fillText('GITHUB →', cardX + 12, cardY + 76);
+
+      // Project index
+      this.ctx.fillStyle = 'rgba(57,255,143,0.3)';
+      this.ctx.font = "5px 'Press Start 2P', monospace";
+      this.ctx.textAlign = 'right';
+      this.ctx.fillText(`#${String(i + 1).padStart(2, '0')}`, cardX + cardW - 10, cardY + 22);
+      this.ctx.textAlign = 'left';
     });
+
+    this.ctx.restore();
+
+    // Scroll indicator
+    if (maxScroll > 0) {
+      const scrollbarH = Math.max(30, (visibleH / totalContentH) * visibleH);
+      const scrollbarY = 100 + (this.projectScrollY / maxScroll) * (visibleH - scrollbarH);
+      this.ctx.fillStyle = 'rgba(57,255,143,0.3)';
+      this.ctx.fillRect(W - 18, 70, 4, visibleH);
+      this.ctx.fillStyle = '#39ff8f';
+      this.ctx.fillRect(W - 18, scrollbarY, 4, scrollbarH);
+    }
   }
 
   drawSpaceBackground(t: number) {
@@ -839,6 +977,106 @@ export class SpaceEngine {
       const alpha = parseFloat(layer.color.match(/[\d.]+(?=\))/)?.[0] || '1') * s.brightness * twinkle;
       this.ctx.fillStyle = layer.color.replace(/[\d.]+\)/, alpha.toFixed(2) + ')');
       this.ctx.fillRect(px, py, layer.size, layer.size);
+    });
+  }
+
+  drawLearningZoomed(t: number) {
+    const W = this.canvas.width;
+    const H = this.canvas.height;
+    const cx = W / 2;
+    const cy = H / 2;
+
+    // Background
+    const bgGrad = this.ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * 0.7);
+    bgGrad.addColorStop(0, 'rgba(15,12,25,1)');
+    bgGrad.addColorStop(1, 'rgba(2,3,8,1)');
+    this.ctx.fillStyle = bgGrad;
+    this.ctx.fillRect(0, 0, W, H);
+
+    // Planet (top center, small)
+    const pulse = 1 + Math.sin(t / 600) * 0.03;
+    const planetR = 25 * pulse;
+    const px = W / 2;
+    const py = 45;
+    const planetGrad = this.ctx.createRadialGradient(px - 8, py - 8, 0, px, py, planetR);
+    planetGrad.addColorStop(0, '#c49a5a');
+    planetGrad.addColorStop(0.5, '#8b6a2b');
+    planetGrad.addColorStop(1, '#4a3a15');
+    this.ctx.fillStyle = planetGrad;
+    this.ctx.beginPath();
+    this.ctx.arc(px, py, planetR, 0, Math.PI * 2);
+    this.ctx.fill();
+
+    // Ring
+    this.ctx.strokeStyle = 'rgba(200,180,140,0.4)';
+    this.ctx.lineWidth = 2;
+    this.ctx.beginPath();
+    this.ctx.ellipse(px, py, planetR * 2, planetR * 0.4, 0.3, 0, Math.PI * 2);
+    this.ctx.stroke();
+
+    // Title
+    this.ctx.fillStyle = '#39ff8f';
+    this.ctx.font = "bold 10px 'Press Start 2P', monospace";
+    this.ctx.textAlign = 'center';
+    this.ctx.fillText('// LEARNING QUEUE', W / 2, 30);
+    this.ctx.fillStyle = 'rgba(57,255,143,0.5)';
+    this.ctx.font = "6px 'Press Start 2P', monospace";
+    this.ctx.fillText(`${this.learningItems.length} ITEMS IN PROGRESS`, W / 2, 88);
+    this.ctx.textAlign = 'left';
+
+    // Learning items grid
+    const cardW = 220;
+    const cardH = 70;
+    const gap = 10;
+    const cols = 4;
+    const totalGridW = cols * cardW + (cols - 1) * gap;
+    const startX = (W - totalGridW) / 2;
+    const startY = 105;
+
+    this.learningItems.forEach((item, i) => {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const cardX = startX + col * (cardW + gap);
+      const cardY = startY + row * (cardH + gap);
+
+      // Card background
+      this.ctx.fillStyle = 'rgba(2,3,8,0.9)';
+      this.ctx.strokeStyle = 'rgba(57,255,143,0.3)';
+      this.ctx.lineWidth = 1;
+      this.ctx.beginPath();
+      this.ctx.roundRect(cardX, cardY, cardW, cardH, 3);
+      this.ctx.fill();
+      this.ctx.stroke();
+
+      // Category
+      this.ctx.fillStyle = 'rgba(57,255,143,0.4)';
+      this.ctx.font = "5px 'Press Start 2P', monospace";
+      this.ctx.textAlign = 'left';
+      this.ctx.fillText(item.category, cardX + 10, cardY + 14);
+
+      // Name
+      this.ctx.fillStyle = '#39ff8f';
+      this.ctx.font = "bold 8px 'Press Start 2P', monospace";
+      this.ctx.fillText(item.name, cardX + 10, cardY + 28);
+
+      // Description
+      this.ctx.fillStyle = 'rgba(57,255,143,0.5)';
+      this.ctx.font = "5px 'Press Start 2P', monospace";
+      const desc = item.description.length > 35 ? item.description.slice(0, 35) + '...' : item.description;
+      this.ctx.fillText(desc, cardX + 10, cardY + 42);
+
+      // Progress bar background
+      this.ctx.fillStyle = 'rgba(57,255,143,0.1)';
+      this.ctx.fillRect(cardX + 10, cardY + 52, cardW - 20, 5);
+
+      // Progress bar fill
+      this.ctx.fillStyle = item.progress >= 70 ? '#39ff8f' : item.progress >= 40 ? '#e8c56a' : '#ff6b6b';
+      this.ctx.fillRect(cardX + 10, cardY + 52, (cardW - 20) * item.progress / 100, 5);
+
+      // Progress text
+      this.ctx.fillStyle = 'rgba(57,255,143,0.6)';
+      this.ctx.font = "5px 'Press Start 2P', monospace";
+      this.ctx.fillText(`${item.progress}%`, cardX + cardW - 30, cardY + 42);
     });
   }
 
