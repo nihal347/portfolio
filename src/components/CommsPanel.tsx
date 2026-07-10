@@ -40,7 +40,7 @@ export function CommsPanel() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
-    const web3FormsKey = 'YOUR_ACCESS_KEY_HERE'
+    const web3FormsKey = '04a29f89-7406-47ec-8922-7c1f12d25712'
     
     if (web3FormsKey === 'YOUR_ACCESS_KEY_HERE' || !web3FormsKey) {
       const mailtoLink = `mailto:nihalakndo321@gmail.com?subject=Portfolio Contact from ${encodeURIComponent(formData.name)}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`)}`
