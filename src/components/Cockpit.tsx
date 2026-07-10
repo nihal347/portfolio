@@ -371,6 +371,31 @@ export function Cockpit() {
 
       </div>
 
+      {/* ═══ MOBILE — minimal bottom bar ═══ */}
+      {isMobile && (
+        <div className="fixed bottom-0 left-0 right-0 z-[45] pointer-events-auto px-2 pb-2 pt-6" style={{
+          background: 'linear-gradient(to top, rgba(2,3,8,0.95) 60%, transparent)',
+        }}>
+          <div className="flex justify-center gap-1">
+            <button onClick={() => { playClick(); toggleSound() }} className="fb-square-btn !text-[7px] !px-2 !py-1.5 !min-h-0" style={settings.soundEnabled ? { color: '#39ff8f', borderColor: 'rgba(57,255,143,0.4)' } : { color: '#ff3939', borderColor: 'rgba(255,57,57,0.2)' }}>
+              {settings.soundEnabled ? 'SFX' : 'SFX OFF'}
+            </button>
+            <button onClick={() => { playClick(); toggleLabels() }} className="fb-square-btn !text-[7px] !px-2 !py-1.5 !min-h-0" style={controls.labels ? { color: '#39ff8f', borderColor: 'rgba(57,255,143,0.4)' } : { color: '#ff3939', borderColor: 'rgba(255,57,57,0.2)' }}>
+              LBL
+            </button>
+            <button onClick={() => { playClick(); cycleZoom() }} className="fb-square-btn !text-[7px] !px-2 !py-1.5 !min-h-0">
+              {Math.round(controls.zoom * 100)}%
+            </button>
+            <a href="https://github.com/Nihal347" target="_blank" rel="noreferrer" className="fb-square-btn !text-[7px] !px-2 !py-1.5 !min-h-0">
+              GH
+            </a>
+            <a href="mailto:nihalakndo321@gmail.com" className="fb-square-btn !text-[7px] !px-2 !py-1.5 !min-h-0">
+              MSG
+            </a>
+          </div>
+        </div>
+      )}
+
       {/* ═══ COCKPIT VIEWPORT ═══ */}
       {!isMobile && <div className="fixed inset-0 z-30 pointer-events-none" style={{
         opacity: showViewport ? 1 : 0,
