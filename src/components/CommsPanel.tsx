@@ -20,7 +20,7 @@ export function CommsPanel() {
         
         setTimeout(() => {
             const link = document.createElement('a')
-            link.href = '/resume.pdf'
+            link.href = (import.meta.env.BASE_URL || '/') + 'resume.pdf'
             link.download = 'nihal_resume.pdf'
             document.body.appendChild(link)
             link.click()
@@ -69,7 +69,7 @@ export function CommsPanel() {
 
   return (
     <>
-    <div className="fixed inset-0 z-30 overflow-y-auto" style={{ background: 'rgba(2,3,8,0.92)', backdropFilter: 'blur(12px)' }}>
+    <div className="fixed inset-0 z-50 overflow-y-auto" style={{ background: 'rgba(2,3,8,0.92)', backdropFilter: 'blur(12px)' }}>
       <div className="max-w-5xl w-full mx-auto space-y-6 animate-fade-in text-left pt-16 pb-24 px-4">
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

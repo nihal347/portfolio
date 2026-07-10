@@ -294,7 +294,7 @@ export function Cockpit() {
             <button onClick={() => {
               playClick()
               const link = document.createElement('a')
-              link.href = '/resume.pdf'
+              link.href = (import.meta.env.BASE_URL || '/') + 'resume.pdf'
               link.download = 'nihal_resume.pdf'
               document.body.appendChild(link)
               link.click()

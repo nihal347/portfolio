@@ -24,7 +24,7 @@ ${profile.bio}`
 
   return (
     <>
-    <div className="fixed inset-0 z-30 overflow-y-auto" style={{ background: 'rgba(2,3,8,0.92)', backdropFilter: 'blur(12px)' }}>
+    <div className="fixed inset-0 z-50 overflow-y-auto" style={{ background: 'rgba(2,3,8,0.92)', backdropFilter: 'blur(12px)' }}>
       <div className="max-w-5xl w-full mx-auto space-y-6 animate-fade-in text-left pt-16 pb-24 px-4">
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

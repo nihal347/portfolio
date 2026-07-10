@@ -100,7 +100,8 @@ export function useContent(): { content: SiteContent; loading: boolean } {
 
     async function fetchContent() {
       try {
-        const res = await fetch('/content.json?t=' + Date.now())
+        const base = import.meta.env.BASE_URL || '/'
+        const res = await fetch(`${base}content.json?t=` + Date.now())
         if (!res.ok) throw new Error('Failed to load content')
         const data: SiteContent = await res.json()
 
