@@ -88,6 +88,21 @@ export function CanvasSpace() {
     window.addEventListener('mousemove', handleMouseMove);
     canvas.addEventListener('click', handleClick);
 
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 1) {
+        const touch = e.touches[0];
+        const synthetic = new MouseEvent('click', { clientX: touch.clientX, clientY: touch.clientY });
+        handleClick(synthetic);
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 1) {
+        const touch = e.touches[0];
+        engine.setMousePos(touch.clientX, touch.clientY);
+      }
+    };
+
     const handleWheel = (e: WheelEvent) => {
       const { activePlanet } = useStore.getState();
       if (activePlanet === 'projects') {
@@ -95,7 +110,23 @@ export function CanvasSpace() {
         engine.projectScrollY += e.deltaY * 0.5;
       }
     };
+
+    const handleTouchScroll = (e: TouchEvent) => {
+      const { activePlanet } = useStore.getState();
+      if (activePlanet === 'projects' && e.touches.length === 1) {
+        const touch = e.touches[0];
+        const prev = (e as any)._prevY;
+        if (prev !== undefined) {
+          engine.projectScrollY += (prev - touch.clientY) * 1.5;
+        }
+        (e as any)._prevY = touch.clientY;
+      }
+    };
+
     canvas.addEventListener('wheel', handleWheel, { passive: false });
+    canvas.addEventListener('touchstart', handleTouchStart, { passive: true });
+    canvas.addEventListener('touchmove', handleTouchMove, { passive: true });
+    canvas.addEventListener('touchmove', handleTouchScroll, { passive: true });
 
     let lastTime = performance.now();
 
@@ -303,6 +334,9 @@ export function CanvasSpace() {
       window.removeEventListener('mousemove', handleMouseMove);
       canvas.removeEventListener('click', handleClick);
       canvas.removeEventListener('wheel', handleWheel);
+      canvas.removeEventListener('touchstart', handleTouchStart);
+      canvas.removeEventListener('touchmove', handleTouchMove);
+      canvas.removeEventListener('touchmove', handleTouchScroll);
       cancelAnimationFrame(animRef.current);
     };
   }, [settings.simpleView, handleClick, handleMouseMove]);

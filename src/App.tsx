@@ -107,6 +107,21 @@ function App() {
       <SystemLog />
       <Toasts />
       {currentView !== 'boot' && !settings.simpleView && <Cursor />}
+
+      {/* Mobile terminal button */}
+      {currentView !== 'boot' && !settings.simpleView && (
+        <button
+          onClick={() => useStore.getState().toggleTerminal()}
+          className="fixed top-3 right-3 z-[60] md:hidden flex items-center justify-center w-10 h-10 border font-mono text-[9px]"
+          style={{
+            borderColor: 'rgba(57,255,143,0.3)',
+            background: 'rgba(2,3,8,0.9)',
+            color: '#39ff8f',
+          }}
+        >
+          {'>'}
+        </button>
+      )}
     </div>
   )
 }

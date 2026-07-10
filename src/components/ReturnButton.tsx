@@ -7,7 +7,7 @@ export function ReturnButton({ color = 'rgba(57,255,143,0.6)' }: { color?: strin
   return (
     <button
       onClick={initiateReturn}
-      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-2 px-5 py-2.5 border font-pixel text-[10px] tracking-wider transition-all duration-300 cursor-pointer hover:scale-105"
+      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-2 px-6 py-3.5 border font-pixel text-[10px] tracking-wider transition-all duration-300 cursor-pointer hover:scale-105 min-h-[44px]"
       style={{
         borderColor: color,
         background: 'rgba(2,3,8,0.95)',

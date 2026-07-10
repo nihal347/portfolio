@@ -42,7 +42,7 @@ export function CommsPanel() {
     
     const web3FormsKey = '04a29f89-7406-47ec-8922-7c1f12d25712'
     
-    if (web3FormsKey === 'YOUR_ACCESS_KEY_HERE' || !web3FormsKey) {
+    if (!web3FormsKey) {
       const mailtoLink = `mailto:nihalakndo321@gmail.com?subject=Portfolio Contact from ${encodeURIComponent(formData.name)}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`)}`
       window.location.href = mailtoLink
       setFormStatus('Opening email client...')
@@ -139,7 +139,7 @@ export function CommsPanel() {
                   required 
                   value={formData.name}
                   onChange={e => setFormData({...formData, name: e.target.value})}
-                  className="w-full bg-transparent outline-none py-1.5 text-white text-xs font-mono" 
+                  className="w-full bg-transparent outline-none py-2.5 text-white text-xs font-mono min-h-[44px]" 
                   style={{ borderBottom: '1px solid rgba(255,61,240,0.3)' }}
                   onFocus={e => { e.currentTarget.style.borderBottomColor = 'var(--color-magenta)' }}
                   onBlur={e => { e.currentTarget.style.borderBottomColor = 'rgba(255,61,240,0.3)' }}
@@ -154,7 +154,7 @@ export function CommsPanel() {
                   required 
                   value={formData.email}
                   onChange={e => setFormData({...formData, email: e.target.value})}
-                  className="w-full bg-transparent outline-none py-1.5 text-white text-xs font-mono"
+                  className="w-full bg-transparent outline-none py-2.5 text-white text-xs font-mono min-h-[44px]"
                   style={{ borderBottom: '1px solid rgba(255,61,240,0.3)' }}
                   onFocus={e => { e.currentTarget.style.borderBottomColor = 'var(--color-magenta)' }}
                   onBlur={e => { e.currentTarget.style.borderBottomColor = 'rgba(255,61,240,0.3)' }}
@@ -176,7 +176,7 @@ export function CommsPanel() {
                 ></textarea>
               </div>
               
-              <button type="submit" className="w-full font-bold py-2.5 transition-all cursor-pointer font-mono text-sm" style={{ background: 'rgba(255,61,240,0.15)', border: '1px solid rgba(255,61,240,0.4)', color: 'var(--color-magenta)' }}
+              <button type="submit" className="w-full font-bold py-3 transition-all cursor-pointer font-mono text-sm min-h-[44px]" style={{ background: 'rgba(255,61,240,0.15)', border: '1px solid rgba(255,61,240,0.4)', color: 'var(--color-magenta)' }}
                 onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,61,240,0.25)'; e.currentTarget.style.boxShadow = '0 0 15px rgba(255,61,240,0.15)' }}
                 onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,61,240,0.15)'; e.currentTarget.style.boxShadow = 'none' }}
               >
@@ -197,17 +197,17 @@ export function CommsPanel() {
           background: 'rgba(2,3,8,0.6)', 
         }}>
           <span className="text-[10px] font-mono" style={{ color: 'rgba(255,61,240,0.4)' }}>DIRECT LINKS:</span>
-          <a href="mailto:nihalakndo321@gmail.com" className="flex items-center gap-1.5 text-[10px] font-mono transition-colors" style={{ color: 'rgba(255,61,240,0.5)' }}
+          <a href="mailto:nihalakndo321@gmail.com" className="flex items-center gap-1.5 text-[11px] font-mono transition-colors py-2 px-3 min-h-[44px] rounded" style={{ color: 'rgba(255,61,240,0.5)' }}
             onMouseEnter={e => { e.currentTarget.style.color = 'var(--color-magenta)' }}
             onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,61,240,0.5)' }}
           >
-            <Mail size={10} /> Email
+            <Mail size={12} /> Email
           </a>
-          <a href="https://github.com/Nihal347" target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-[10px] font-mono transition-colors" style={{ color: 'rgba(255,61,240,0.5)' }}
+          <a href="https://github.com/Nihal347" target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-[11px] font-mono transition-colors py-2 px-3 min-h-[44px] rounded" style={{ color: 'rgba(255,61,240,0.5)' }}
             onMouseEnter={e => { e.currentTarget.style.color = 'var(--color-magenta)' }}
             onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,61,240,0.5)' }}
           >
-            <ExternalLink size={10} /> GitHub
+            <ExternalLink size={12} /> GitHub
           </a>
         </div>
       </div>

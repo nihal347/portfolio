@@ -1,10 +1,17 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 export function Cursor() {
   const dotRef = useRef<HTMLDivElement>(null)
   const ringRef = useRef<HTMLDivElement>(null)
+  const [isTouch, setIsTouch] = useState(false)
 
   useEffect(() => {
+    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+    if (hasTouch) {
+      setIsTouch(true)
+      return
+    }
+
     let mx = 0, my = 0
     let dx = 0, dy = 0
     let rafId = 0
@@ -37,11 +44,11 @@ export function Cursor() {
     }
   }, [])
 
+  if (isTouch) return null
+
   return (
     <>
-      {/* Real cursor hidden */}
       <style>{`* { cursor: none !important; }`}</style>
-      {/* Core dot — on top of everything */}
       <div
         ref={dotRef}
         className="fixed top-0 left-0 z-[9999] pointer-events-none"
@@ -52,7 +59,6 @@ export function Cursor() {
           boxShadow: '0 0 6px #39ff8f, 0 0 12px rgba(57,255,143,0.4)',
         }}
       />
-      {/* Trailing ring */}
       <div
         ref={ringRef}
         className="fixed top-0 left-0 z-[9999] pointer-events-none"
