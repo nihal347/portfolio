@@ -26,7 +26,7 @@ export function SimpleView() {
           <h3 className="text-xl font-bold mb-3">Skills</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
             <div>
-              <strong>Languages:</strong> Python, TypeScript, HTML/CSS
+              <strong>Languages:</strong> Python, C, C#, HTML/CSS
             </div>
             <div>
               <strong>AI/ML:</strong> PyTorch, LangChain, LLMs
@@ -79,13 +79,13 @@ export function SimpleView() {
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-4">Contact & Links</h2>
           <div className="flex gap-6">
-            <a href="mailto:contact@example.com" className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors font-medium">
+            <a href="mailto:nihalakndo321@gmail.com" className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors font-medium">
               <Mail size={20} /> Email Me
             </a>
-            <a href="#" className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors font-medium">
+            <a href="/resume.pdf" download className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors font-medium">
               <FileText size={20} /> Resume
             </a>
-            <a href="#" className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors font-medium">
+            <a href="https://github.com/Nihal347" target="_blank" rel="noreferrer" className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors font-medium">
               <GitBranch size={20} /> GitHub
             </a>
           </div>

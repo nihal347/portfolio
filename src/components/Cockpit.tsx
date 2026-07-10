@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useStore } from '../store/useStore'
-import { RotateCcw, GitBranch, Mail, ExternalLink, FileDown } from 'lucide-react'
+import { GitBranch, Mail, ExternalLink, FileDown } from 'lucide-react'
 import { playClick } from '../hooks/useSound'
 
 const ROLES = [
@@ -72,7 +72,6 @@ export function Cockpit() {
   const log = useStore(s => s.log)
   const unlockAchievement = useStore(s => s.unlockAchievement)
   const achievements = useStore(s => s.achievements)
-  const initiateReturn = useStore(s => s.initiateReturn)
   const toggleTerminal = useStore(s => s.toggleTerminal)
   const toggleLogs = useStore(s => s.toggleLogs)
   const controls = useStore(s => s.controls)
@@ -92,24 +91,42 @@ export function Cockpit() {
   const [roleText, setRoleText] = useState('')
   const [roleIndex, setRoleIndex] = useState(0)
   const [isTyping, setIsTyping] = useState(true)
+  const targetMouse = useRef({ x: 0.5, y: 0.5 })
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 })
   const [winSize, setWinSize] = useState({ w: window.innerWidth, h: window.innerHeight })
   const currentRole = ROLES[roleIndex]
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
-    setMousePos({
+    targetMouse.current = {
       x: e.clientX / window.innerWidth,
       y: e.clientY / window.innerHeight
-    })
+    }
   }, [])
 
   useEffect(() => {
+    let raf: number
+    let cx = 0.5, cy = 0.5
+    const loop = () => {
+      cx += (targetMouse.current.x - cx) * 0.05
+      cy += (targetMouse.current.y - cy) * 0.05
+      
+      setMousePos(prev => {
+        if (Math.abs(prev.x - cx) > 0.0001 || Math.abs(prev.y - cy) > 0.0001) {
+          return { x: cx, y: cy }
+        }
+        return prev
+      })
+      raf = requestAnimationFrame(loop)
+    }
+    raf = requestAnimationFrame(loop)
+
     window.addEventListener('mousemove', handleMouseMove)
     const handleResize = () => setWinSize({ w: window.innerWidth, h: window.innerHeight })
     window.addEventListener('resize', handleResize)
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('resize', handleResize)
+      cancelAnimationFrame(raf)
     }
   }, [handleMouseMove])
 
@@ -199,7 +216,7 @@ export function Cockpit() {
       <div className="cockpit-hex-edge cockpit-hex-edge--left" />
       <div className="cockpit-hex-edge cockpit-hex-edge--right" />
 
-      <div className="fixed inset-0 z-40 pointer-events-none" style={{ transform: `translate(${(mousePos.x - 0.5) * -12}px, ${(mousePos.y - 0.5) * -12}px)`, transition: 'transform 0.1s ease-out' }}>
+      <div className="fixed inset-0 z-40 pointer-events-none" style={{ transform: `translate(${(mousePos.x - 0.5) * 15}px, ${(mousePos.y - 0.5) * 15}px)` }}>
         {/* ═══ HEADER ═══ */}
         <div className="absolute top-0 left-0 right-0 h-8 flex items-center justify-center z-10" style={{
           background: 'linear-gradient(to bottom, rgba(2,3,8,0.9), transparent)',
@@ -211,14 +228,19 @@ export function Cockpit() {
         </div>
 
         {/* ═══ TOP LEFT — SHIP STATUS ═══ */}
-        <div className="floating-box absolute top-12 left-4" style={{ minWidth: '150px' }}>
+        <div className="floating-box absolute top-12 left-4" style={{ minWidth: '160px' }}>
           <div className="fb-title">SHIP STATUS</div>
+          <div className="fb-big text-[8px] mb-1" style={{ color: '#39ff8f' }}>VOYAGER-N</div>
           <div className="fb-row"><span>HULL</span><span className="text-[#39ff8f]">100%</span></div>
           <div className="fb-bar"><div className="fb-bar-fill" style={{ width: '100%' }} /></div>
           <div className="fb-row"><span>SHIELDS</span><span>{shield}%</span></div>
           <div className="fb-bar"><div className="fb-bar-fill" style={{ width: `${shield}%` }} /></div>
           <div className="fb-row"><span>REACTOR</span><span>{reactor}%</span></div>
           <div className="fb-bar"><div className="fb-bar-fill" style={{ width: `${reactor}%` }} /></div>
+          <div className="fb-row mt-1 pt-1" style={{ borderTop: '1px solid rgba(57,255,143,0.15)' }}>
+            <span>MISSIONS</span><span style={{ color: '#39ff8f' }}>{Math.floor(exploration / 15)}/6</span>
+          </div>
+          <div className="fb-row"><span>UPTIME</span><span>{Math.floor((Date.now() - performance.timeOrigin) / 60000)}m</span></div>
         </div>
 
         {/* ═══ TOP RIGHT — SECTOR ═══ */}
@@ -266,9 +288,9 @@ export function Cockpit() {
         <div className="floating-box absolute bottom-4 right-4" style={{ minWidth: '160px' }}>
           <div className="fb-title">CONTROLS</div>
           <div className="flex flex-wrap gap-1">
-            <a href="https://github.com" target="_blank" rel="noreferrer" className="fb-square-btn"><GitBranch size={10} /> GIT</a>
-            <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="fb-square-btn"><ExternalLink size={10} /> LIN</a>
-            <a href="mailto:your.email@example.com" className="fb-square-btn"><Mail size={10} /> MAIL</a>
+            <a href="https://github.com/Nihal347" target="_blank" rel="noreferrer" className="fb-square-btn"><GitBranch size={10} /> GIT</a>
+            <a href="https://www.linkedin.com/in/nihal-akndo/" target="_blank" rel="noreferrer" className="fb-square-btn"><ExternalLink size={10} /> LIN</a>
+            <a href="mailto:nihalakndo321@gmail.com" className="fb-square-btn"><Mail size={10} /> MAIL</a>
             <button onClick={() => {
               playClick()
               const link = document.createElement('a')
@@ -283,13 +305,31 @@ export function Cockpit() {
           </div>
         </div>
 
-        {/* ═══ CENTER — return button ═══ */}
-        {isOnPage && !isAnimating && (
-          <div className="absolute bottom-16 left-1/2 -translate-x-1/2 pointer-events-auto animate-fade-in">
-            <button onClick={() => { playClick(); initiateReturn() }} className="fb-btn fb-btn-lg">
-              <RotateCcw size={11} /> RETURN TO ORBIT
-            </button>
+        {/* ═══ BOTTOM CENTER — Language Mastery ═══ */}
+        {!isOnPage && (
+        <div className="floating-box absolute bottom-4 left-1/2 -translate-x-1/2" style={{ minWidth: '180px' }}>
+          <div className="fb-title text-center mb-2">LANGUAGE MASTERY</div>
+          <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-0.5">
+              <div className="flex justify-between text-[7px] font-['JetBrains_Mono'] text-[#39ff8f]/80"><span>PYTHON</span><span>90%</span></div>
+              <div className="h-1 bg-[#0a0f1c] border border-[#39ff8f]/30 relative overflow-hidden">
+                <div className="absolute top-0 left-0 h-full bg-[#39ff8f]" style={{ width: '90%', boxShadow: '0 0 5px #39ff8f' }} />
+              </div>
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <div className="flex justify-between text-[7px] font-['JetBrains_Mono'] text-[#39ff8f]/80"><span>TYPESCRIPT</span><span>80%</span></div>
+              <div className="h-1 bg-[#0a0f1c] border border-[#39ff8f]/30 relative overflow-hidden">
+                <div className="absolute top-0 left-0 h-full bg-[#39ff8f]" style={{ width: '80%', boxShadow: '0 0 5px #39ff8f' }} />
+              </div>
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <div className="flex justify-between text-[7px] font-['JetBrains_Mono'] text-[#39ff8f]/80"><span>C/C++</span><span>75%</span></div>
+              <div className="h-1 bg-[#0a0f1c] border border-[#39ff8f]/30 relative overflow-hidden">
+                <div className="absolute top-0 left-0 h-full bg-[#39ff8f]" style={{ width: '75%', boxShadow: '0 0 5px #39ff8f' }} />
+              </div>
+            </div>
           </div>
+        </div>
         )}
 
         {/* ═══ Travel overlay ═══ */}
@@ -322,10 +362,10 @@ export function Cockpit() {
         transform: showViewport ? 'scale(1)' : 'scale(3)',
         transition: 'opacity 0.8s ease-in-out, transform 0.8s ease-in-out'
       }}>
-        <div className="absolute inset-0" style={{ transform: `translate(${(mousePos.x - 0.5) * -15}px, ${(mousePos.y - 0.5) * -15}px)`, transition: 'transform 0.1s ease-out' }}>
+        <div className="absolute inset-0" style={{ transform: `translate(${(mousePos.x - 0.5) * 25}px, ${(mousePos.y - 0.5) * 25}px)` }}>
           {(() => {
-            const ox = (mousePos.x - 0.5) * 15
-            const oy = (mousePos.y - 0.5) * 15
+            const ox = (mousePos.x - 0.5) * 25
+            const oy = (mousePos.y - 0.5) * 25
             const cx = winSize.w / 2 + ox
             const cy = winSize.h / 2 + oy
             const half = 110

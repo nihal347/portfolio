@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { TerminalText } from './TerminalText'
+import { ReturnButton } from './ReturnButton'
 import { useStore } from '../store/useStore'
 import { Download, Send, Mail, ExternalLink } from 'lucide-react'
 
@@ -42,7 +43,7 @@ export function CommsPanel() {
     const web3FormsKey = 'YOUR_ACCESS_KEY_HERE'
     
     if (web3FormsKey === 'YOUR_ACCESS_KEY_HERE' || !web3FormsKey) {
-      const mailtoLink = `mailto:your.email@example.com?subject=Portfolio Contact from ${encodeURIComponent(formData.name)}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`)}`
+      const mailtoLink = `mailto:nihalakndo321@gmail.com?subject=Portfolio Contact from ${encodeURIComponent(formData.name)}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`)}`
       window.location.href = mailtoLink
       setFormStatus('Opening email client...')
     } else {
@@ -67,8 +68,9 @@ export function CommsPanel() {
   }
 
   return (
-    <div className="page-scroll">
-      <div className="max-w-5xl w-full mx-auto space-y-6 animate-fade-in text-left pt-12">
+    <>
+    <div className="fixed inset-0 z-30 overflow-y-auto" style={{ background: 'rgba(2,3,8,0.92)', backdropFilter: 'blur(12px)' }}>
+      <div className="max-w-5xl w-full mx-auto space-y-6 animate-fade-in text-left pt-16 pb-24 px-4">
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
@@ -174,7 +176,7 @@ export function CommsPanel() {
                 ></textarea>
               </div>
               
-              <button type="submit" className="w-full font-bold py-2.5 transition-all cursor-pointer font-mono text-sm" style={{ background: 'rgba(255,61,240,0.15)', borderColor: '1px solid rgba(255,61,240,0.4)', color: 'var(--color-magenta)' }}
+              <button type="submit" className="w-full font-bold py-2.5 transition-all cursor-pointer font-mono text-sm" style={{ background: 'rgba(255,61,240,0.15)', border: '1px solid rgba(255,61,240,0.4)', color: 'var(--color-magenta)' }}
                 onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,61,240,0.25)'; e.currentTarget.style.boxShadow = '0 0 15px rgba(255,61,240,0.15)' }}
                 onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,61,240,0.15)'; e.currentTarget.style.boxShadow = 'none' }}
               >
@@ -195,13 +197,13 @@ export function CommsPanel() {
           background: 'rgba(2,3,8,0.6)', 
         }}>
           <span className="text-[10px] font-mono" style={{ color: 'rgba(255,61,240,0.4)' }}>DIRECT LINKS:</span>
-          <a href="mailto:your.email@example.com" className="flex items-center gap-1.5 text-[10px] font-mono transition-colors" style={{ color: 'rgba(255,61,240,0.5)' }}
+          <a href="mailto:nihalakndo321@gmail.com" className="flex items-center gap-1.5 text-[10px] font-mono transition-colors" style={{ color: 'rgba(255,61,240,0.5)' }}
             onMouseEnter={e => { e.currentTarget.style.color = 'var(--color-magenta)' }}
             onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,61,240,0.5)' }}
           >
             <Mail size={10} /> Email
           </a>
-          <a href="https://github.com" target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-[10px] font-mono transition-colors" style={{ color: 'rgba(255,61,240,0.5)' }}
+          <a href="https://github.com/Nihal347" target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-[10px] font-mono transition-colors" style={{ color: 'rgba(255,61,240,0.5)' }}
             onMouseEnter={e => { e.currentTarget.style.color = 'var(--color-magenta)' }}
             onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,61,240,0.5)' }}
           >
@@ -210,5 +212,7 @@ export function CommsPanel() {
         </div>
       </div>
     </div>
+    <ReturnButton color="rgba(255,61,240,0.6)" />
+    </>
   )
 }

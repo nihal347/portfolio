@@ -1,15 +1,29 @@
 import { useStore } from '../store/useStore'
 
+// Shared AudioContext to avoid browser limit of ~6-8 contexts
+let sharedCtx: AudioContext | null = null
+
+function getAudioContext(): AudioContext | null {
+  if (sharedCtx && sharedCtx.state !== 'closed') return sharedCtx
+  try {
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext
+    if (!AudioContextClass) return null
+    sharedCtx = new AudioContextClass()
+    return sharedCtx
+  } catch {
+    return null
+  }
+}
+
 // Simple Web Audio API synthesizer for retro sound effects
 export function playBeep(freq = 440, type: OscillatorType = 'square', duration = 0.1, vol = 0.1) {
   const { settings } = useStore.getState()
   if (!settings.soundEnabled) return
 
   try {
-      const AudioContext = window.AudioContext || (window as any).webkitAudioContext
-      if (!AudioContext) return
+      const ctx = getAudioContext()
+      if (!ctx) return
       
-      const ctx = new AudioContext()
       const osc = ctx.createOscillator()
       const gain = ctx.createGain()
       
@@ -47,10 +61,9 @@ export function startEngine() {
     if (engineOsc) return
 
     try {
-        const AudioContext = window.AudioContext || (window as any).webkitAudioContext
-        if (!AudioContext) return
+        const ctx = getAudioContext()
+        if (!ctx) return
         
-        const ctx = new AudioContext()
         engineOsc = ctx.createOscillator()
         engineGain = ctx.createGain()
         

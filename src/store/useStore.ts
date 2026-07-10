@@ -250,6 +250,7 @@ export const useStore = create<AppState>()(
           },
           ship: { phase: 'idle', target: null, startTime: 0 },
           activePlanet: null,
+          currentView: 'hub',
         })
         get().pushLog('System reset to defaults')
       },

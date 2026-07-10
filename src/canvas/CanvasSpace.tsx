@@ -82,6 +82,7 @@ export function CanvasSpace() {
     window.addEventListener('resize', handleResize);
 
     const engine = new SpaceEngine(canvas);
+    engine.loadContent();
     engineRef.current = engine;
 
     window.addEventListener('mousemove', handleMouseMove);
@@ -206,7 +207,7 @@ export function CanvasSpace() {
           ctx.translate(-camX, -camY);
 
           engine.update(dt);
-          engine.draw(time, labelAlpha > 0.05, controls.orbits, controls.radar);
+          engine.draw(time, labelAlpha > 0.05, controls.orbits ?? true, controls.radar ?? false, controls.scanActive ?? false);
           ctx.restore();
 
           if (starStreak > 0.01) {
@@ -270,8 +271,25 @@ export function CanvasSpace() {
             engine.drawZoomedPlanet(ap, time, 1);
           }
         } else {
-          engine.update(dt);
-          engine.draw(time, controls.labels, controls.orbits, controls.radar);
+          engine.update(dt * (controls.timeSpeed ?? 1));
+          
+          ctx.save();
+          let camX = W / 2;
+          let camY = H / 2;
+          
+          if (controls.track) {
+             const t = time / 3000;
+             camX = W / 2 + Math.cos(t) * 100;
+             camY = H / 2 + Math.sin(t) * 100;
+          }
+          
+          ctx.translate(W / 2, H / 2);
+          const currentZoom = controls.zoom ?? 1;
+          ctx.scale(currentZoom, currentZoom);
+          ctx.translate(-camX, -camY);
+
+          engine.draw(time, controls.labels ?? true, controls.orbits ?? true, controls.radar ?? false, controls.scanActive ?? false);
+          ctx.restore();
         }
       }
 

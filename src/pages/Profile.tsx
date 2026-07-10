@@ -1,18 +1,31 @@
 import { TerminalText } from '../components/TerminalText'
+import { ReturnButton } from '../components/ReturnButton'
 import { User, Code2, Database, BrainCircuit, TerminalSquare } from 'lucide-react'
+import { useContent } from '../hooks/useContent'
+
+const GROUP_ICONS: Record<string, React.ReactNode> = {
+  'Languages': <Code2 size={14} />,
+  'AI/ML': <BrainCircuit size={14} />,
+  'Backend': <Database size={14} />,
+  'Tools': <TerminalSquare size={14} />,
+}
 
 export function Profile() {
+  const { content } = useContent()
+  const { profile } = content
+
   const bioText = `> Class: Self-Taught Developer
 > Base: Earth (Sec-42)
 
 Loading bio...
 $ cat about.txt
 
-I'm a self-taught developer primarily focused on Python, currently forging a path toward AI/ML engineering. When I'm not training models or building tools like my JARVIS-styled AI assistant 'Siji', I'm usually gaming, watching anime, or playing guitar. My ultimate objective is to found a tech startup that pushes the boundaries of what's possible.`
+${profile.bio}`
 
   return (
-    <div className="page-scroll">
-      <div className="max-w-5xl w-full mx-auto space-y-6 animate-fade-in text-left pt-12">
+    <>
+    <div className="fixed inset-0 z-30 overflow-y-auto" style={{ background: 'rgba(2,3,8,0.92)', backdropFilter: 'blur(12px)' }}>
+      <div className="max-w-5xl w-full mx-auto space-y-6 animate-fade-in text-left pt-16 pb-24 px-4">
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Profile Card */}
@@ -29,12 +42,12 @@ I'm a self-taught developer primarily focused on Python, currently forging a pat
                 <User size={60} style={{ color: 'rgba(109,179,242,0.8)' }} />
                 <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full animate-pulse" style={{ background: '#39ff8f' }} />
              </div>
-             <h2 className="font-pixel text-xl mb-1 text-white">NIHAL</h2>
-             <p className="text-xs mb-4" style={{ color: 'rgba(109,179,242,0.6)' }}>SELF-TAUGHT DEV</p>
+             <h2 className="font-pixel text-xl mb-1 text-white">{profile.name}</h2>
+             <p className="text-xs mb-4" style={{ color: 'rgba(109,179,242,0.6)' }}>{profile.title}</p>
              <div className="w-full text-left text-[11px] space-y-1.5 pt-4 font-mono" style={{ borderTop: '1px solid rgba(58,123,213,0.3)', color: 'rgba(109,179,242,0.5)' }}>
-                <p>&gt; Python, C, TypeScript</p>
-                <p>&gt; AI/ML enthusiast</p>
-                <p>&gt; Building Siji v0.1</p>
+                <p>&gt; {profile.languages}</p>
+                <p>&gt; {profile.focus}</p>
+                <p>&gt; {profile.project}</p>
                 <p className="animate-pulse mt-3" style={{ color: 'var(--color-earth)' }}>&gt; STATUS: ACTIVE</p>
              </div>
           </div>
@@ -62,32 +75,19 @@ I'm a self-taught developer primarily focused on Python, currently forging a pat
             <h3 className="font-pixel text-sm mb-5 pb-3 text-white" style={{ borderBottom: '1px solid rgba(58,123,213,0.3)' }}>SKILL_TREE.sys</h3>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                <SkillGroup title="Languages" icon={<Code2 size={14}/>}>
-                    <SkillNode name="Python" level={70} status="Intermediate" />
-                    <SkillNode name="TypeScript" level={85} status="Proficient" />
-                    <SkillNode name="HTML/CSS" level={80} status="Proficient" />
-                </SkillGroup>
-
-                <SkillGroup title="AI/ML" icon={<BrainCircuit size={14}/>}>
-                    <SkillNode name="PyTorch" level={35} status="Learning" />
-                    <SkillNode name="LangChain" level={55} status="Intermediate" />
-                    <SkillNode name="LLMs" level={50} status="Intermediate" />
-                </SkillGroup>
-
-                <SkillGroup title="Tools" icon={<TerminalSquare size={14}/>}>
-                    <SkillNode name="Git" level={80} status="Proficient" />
-                    <SkillNode name="React" level={75} status="Proficient" />
-                    <SkillNode name="Docker" level={30} status="Learning" />
-                </SkillGroup>
-
-                <SkillGroup title="Learning" icon={<Database size={14}/>}>
-                    <SkillNode name="Linear Alg" level={25} status="Active" />
-                    <SkillNode name="Siji v0.1" level={45} status="Active" />
-                </SkillGroup>
+                {profile.skillGroups.map((group) => (
+                  <SkillGroup key={group.title} title={group.title} icon={GROUP_ICONS[group.title] || <Code2 size={14} />}>
+                    {group.skills.map((skill) => (
+                      <SkillNode key={skill.name} name={skill.name} level={skill.level} status={skill.status} />
+                    ))}
+                  </SkillGroup>
+                ))}
             </div>
         </div>
       </div>
     </div>
+    <ReturnButton color="rgba(58,123,213,0.6)" />
+    </>
   )
 }
 

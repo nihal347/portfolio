@@ -1,0 +1,240 @@
+{
+  "profile": {
+    "name": "NIHAL",
+    "title": "SELF-TAUGHT DEV",
+    "languages": "Python, C, C#",
+    "focus": "AI/ML enthusiast",
+    "project": "Building Siji v0.2",
+    "bio": "I'm a self-taught developer primarily focused on Python, currently forging a path toward AI/ML engineering. When I'm not training models or building tools like my JARVIS-styled AI assistant 'Siji', I'm usually gaming, watching anime, or playing guitar. My ultimate objective is to found a tech startup that pushes the boundaries of what's possible.",
+    "skillGroups": [
+      {
+        "title": "Languages",
+        "skills": [
+          { "name": "Python", "level": 90, "status": "Advanced" },
+          { "name": "C#", "level": 65, "status": "Intermediate" },
+          { "name": "C/C++", "level": 75, "status": "Proficient" },
+          { "name": "SQL", "level": 60, "status": "Intermediate" }
+        ]
+      },
+      {
+        "title": "AI/ML",
+        "skills": [
+          { "name": "PyTorch", "level": 55, "status": "Intermediate" },
+          { "name": "LangChain", "level": 65, "status": "Intermediate" },
+          { "name": "NLP/CV", "level": 55, "status": "Intermediate" },
+          { "name": "RAG", "level": 50, "status": "Learning" }
+        ]
+      },
+      {
+        "title": "Backend",
+        "skills": [
+          { "name": "FastAPI", "level": 65, "status": "Intermediate" },
+          { "name": "Flask", "level": 70, "status": "Proficient" },
+          { "name": "REST APIs", "level": 75, "status": "Proficient" },
+          { "name": "React", "level": 75, "status": "Proficient" }
+        ]
+      },
+      {
+        "title": "Tools",
+        "skills": [
+          { "name": "Git/GitHub", "level": 80, "status": "Proficient" },
+          { "name": "Docker", "level": 40, "status": "Learning" },
+          { "name": "Linux", "level": 65, "status": "Intermediate" },
+          { "name": "PostgreSQL", "level": 55, "status": "Intermediate" }
+        ]
+      }
+    ]
+  },
+
+  "techStack": [
+    {
+      "title": "LANGUAGES",
+      "items": [
+        { "name": "Python", "level": 90, "status": "Advanced" },
+        { "name": "C", "level": 75, "status": "Proficient" },
+        { "name": "C#", "level": 65, "status": "Intermediate" },
+        { "name": "JavaScript", "level": 70, "status": "Proficient" },
+        { "name": "SQL", "level": 60, "status": "Intermediate" }
+      ]
+    },
+    {
+      "title": "AI / ML",
+      "items": [
+        { "name": "PyTorch", "level": 55, "status": "Intermediate" },
+        { "name": "TensorFlow", "level": 45, "status": "Learning" },
+        { "name": "Scikit-learn", "level": 60, "status": "Intermediate" },
+        { "name": "LangChain", "level": 65, "status": "Intermediate" },
+        { "name": "LangGraph", "level": 50, "status": "Learning" },
+        { "name": "Hugging Face", "level": 55, "status": "Intermediate" },
+        { "name": "RAG", "level": 50, "status": "Learning" },
+        { "name": "NLP", "level": 55, "status": "Intermediate" },
+        { "name": "Deep Learning", "level": 50, "status": "Learning" }
+      ]
+    },
+    {
+      "title": "COMPUTER VISION",
+      "items": [
+        { "name": "OpenCV", "level": 60, "status": "Intermediate" },
+        { "name": "YOLO", "level": 50, "status": "Learning" },
+        { "name": "OCR", "level": 45, "status": "Learning" },
+        { "name": "Image Processing", "level": 55, "status": "Intermediate" }
+      ]
+    },
+    {
+      "title": "DATA SCIENCE",
+      "items": [
+        { "name": "NumPy", "level": 70, "status": "Proficient" },
+        { "name": "Pandas", "level": 65, "status": "Intermediate" },
+        { "name": "Matplotlib", "level": 60, "status": "Intermediate" },
+        { "name": "Feature Engineering", "level": 50, "status": "Learning" }
+      ]
+    },
+    {
+      "title": "BACKEND & APIS",
+      "items": [
+        { "name": "FastAPI", "level": 65, "status": "Intermediate" },
+        { "name": "Flask", "level": 70, "status": "Proficient" },
+        { "name": "REST APIs", "level": 75, "status": "Proficient" },
+        { "name": "WebSockets", "level": 45, "status": "Learning" }
+      ]
+    },
+    {
+      "title": "FRONTEND",
+      "items": [
+        { "name": "React", "level": 75, "status": "Proficient" },
+        { "name": "HTML5", "level": 85, "status": "Advanced" },
+        { "name": "CSS3", "level": 80, "status": "Proficient" },
+        { "name": "Three.js", "level": 40, "status": "Learning" }
+      ]
+    },
+    {
+      "title": "DATABASES",
+      "items": [
+        { "name": "PostgreSQL", "level": 55, "status": "Intermediate" },
+        { "name": "SQLite", "level": 65, "status": "Intermediate" },
+        { "name": "MongoDB", "level": 50, "status": "Learning" },
+        { "name": "FAISS", "level": 45, "status": "Learning" },
+        { "name": "ChromaDB", "level": 40, "status": "Learning" }
+      ]
+    },
+    {
+      "title": "DEVOPS & TOOLS",
+      "items": [
+        { "name": "Git / GitHub", "level": 80, "status": "Proficient" },
+        { "name": "Docker", "level": 40, "status": "Learning" },
+        { "name": "Jupyter Notebook", "level": 85, "status": "Advanced" },
+        { "name": "VS Code", "level": 90, "status": "Advanced" },
+        { "name": "Linux", "level": 65, "status": "Intermediate" },
+        { "name": "Postman", "level": 70, "status": "Proficient" }
+      ]
+    },
+    {
+      "title": "AUTOMATION",
+      "items": [
+        { "name": "Playwright", "level": 55, "status": "Intermediate" },
+        { "name": "Selenium", "level": 60, "status": "Intermediate" },
+        { "name": "BeautifulSoup", "level": 70, "status": "Proficient" },
+        { "name": "Requests", "level": 80, "status": "Proficient" }
+      ]
+    },
+    {
+      "title": "CLOUD & DEPLOY",
+      "items": [
+        { "name": "Render", "level": 55, "status": "Intermediate" },
+        { "name": "Vercel", "level": 50, "status": "Learning" },
+        { "name": "GitHub Actions", "level": 45, "status": "Learning" }
+      ]
+    }
+  ],
+
+  "learning": {
+    "paths": [
+      {
+        "title": "CURRENT FOCUS",
+        "items": [
+          { "name": "Deep Learning Fundamentals", "progress": 35, "status": "Active" },
+          { "name": "Transformer Architecture", "progress": 25, "status": "Active" },
+          { "name": "LLM Fine-tuning", "progress": 20, "status": "Planned" },
+          { "name": "MLOps & Deployment", "progress": 15, "status": "Planned" }
+        ]
+      },
+      {
+        "title": "COMPLETED",
+        "items": [
+          { "name": "Python Mastery", "progress": 90, "status": "Done" },
+          { "name": "React & C#", "progress": 70, "status": "Done" },
+          { "name": "CS50 AI Course", "progress": 100, "status": "Done" },
+          { "name": "Web Scraping", "progress": 75, "status": "Done" }
+        ]
+      },
+      {
+        "title": "ROADMAP",
+        "items": [
+          { "name": "Build Siji v1.0", "progress": 45, "status": "In Progress" },
+          { "name": "Contribute to Open Source", "progress": 10, "status": "Planned" },
+          { "name": "Deploy ML Models at Scale", "progress": 0, "status": "Future" },
+          { "name": "Start Tech Startup", "progress": 0, "status": "Future" }
+        ]
+      }
+    ],
+    "books": [
+      { "title": "Deep Learning", "author": "Goodfellow et al.", "status": "Reading" },
+      { "title": "Hands-On Machine Learning", "author": "Aurélien Géron", "status": "Reading" },
+      { "title": "Designing Machine Learning Systems", "author": "Chip Huyen", "status": "Planned" },
+      { "title": "The Pragmatic Programmer", "author": "Hunt & Thomas", "status": "Complete" }
+    ]
+  },
+
+  "techKeywords": "Agentic AI Systems | DSA | OOP | Multithreading | Async Programming",
+
+  "satellites": [
+    { "name": "PYTHON", "status": "ONLINE", "experience": "4+ Years", "level": 90, "description": "Core language for AI/ML and automation", "usedFor": ["Machine Learning", "Automation", "Backend", "APIs", "Data Analysis"], "category": "CORE SYSTEMS" },
+    { "name": "C", "status": "ONLINE", "experience": "1+ Years", "level": 75, "description": "Low-level systems programming", "usedFor": ["Systems Programming", "Performance"], "category": "CORE SYSTEMS" },
+    { "name": "C#", "status": "ONLINE", "experience": "1+ Years", "level": 65, "description": "Object-oriented application development", "usedFor": ["Desktop Apps", "Game Dev", "Unity"], "category": "CORE SYSTEMS" },
+    { "name": "JAVASCRIPT", "status": "ONLINE", "experience": "2+ Years", "level": 70, "description": "Web development and scripting", "usedFor": ["Frontend", "Web Apps", "Node.js"], "category": "CORE SYSTEMS" },
+    { "name": "SQL", "status": "ONLINE", "experience": "2+ Years", "level": 60, "description": "Database query language", "usedFor": ["Data Queries", "Database Management"], "category": "CORE SYSTEMS" },
+    { "name": "PYTORCH", "status": "ONLINE", "experience": "1+ Years", "level": 55, "description": "Deep learning framework", "usedFor": ["Neural Networks", "Research", "Model Training"], "category": "AI MODULES" },
+    { "name": "TENSORFLOW", "status": "LEARNING", "experience": "6+ Months", "level": 45, "description": "Production ML platform", "usedFor": ["Deep Learning", "Deployment"], "category": "AI MODULES" },
+    { "name": "SCIKIT-LEARN", "status": "ONLINE", "experience": "2+ Years", "level": 60, "description": "Machine learning library for Python", "usedFor": ["ML Models", "Data Mining", "Classification"], "category": "AI MODULES" },
+    { "name": "LANGCHAIN", "status": "ONLINE", "experience": "1+ Years", "level": 65, "description": "LLM application framework", "usedFor": ["LLMs", "RAG", "Agents"], "category": "AI MODULES" },
+    { "name": "HUGGING FACE", "status": "ONLINE", "experience": "1+ Years", "level": 55, "description": "Transformer models platform", "usedFor": ["NLP", "LLMs", "Model Hub"], "category": "AI MODULES" },
+    { "name": "OPENCV", "status": "ONLINE", "experience": "1+ Years", "level": 60, "description": "Computer vision library", "usedFor": ["Image Processing", "Object Detection", "OCR"], "category": "AI MODULES" },
+    { "name": "FASTAPI", "status": "ONLINE", "experience": "1+ Years", "level": 65, "description": "Modern async API framework", "usedFor": ["REST APIs", "Microservices", "WebSockets"], "category": "WEB MODULES" },
+    { "name": "FLASK", "status": "ONLINE", "experience": "2+ Years", "level": 70, "description": "Lightweight web framework", "usedFor": ["APIs", "Web Apps", "Backends"], "category": "WEB MODULES" },
+    { "name": "REACT", "status": "ONLINE", "experience": "2+ Years", "level": 75, "description": "Frontend UI library", "usedFor": ["Web Apps", "UI Components", "SPA"], "category": "WEB MODULES" },
+    { "name": "POSTGRESQL", "status": "ONLINE", "experience": "1+ Years", "level": 55, "description": "Advanced relational database", "usedFor": ["Data Storage", "Backend DB"], "category": "DATA CORE" },
+    { "name": "MONGODB", "status": "LEARNING", "experience": "6+ Months", "level": 50, "description": "NoSQL document database", "usedFor": ["Data Storage", "Backend DB"], "category": "DATA CORE" },
+    { "name": "SQLITE", "status": "ONLINE", "experience": "2+ Years", "level": 65, "description": "Lightweight SQL database", "usedFor": ["Local Storage", "Embedded DB"], "category": "DATA CORE" },
+    { "name": "FAISS", "status": "LEARNING", "experience": "3+ Months", "level": 45, "description": "Vector similarity search", "usedFor": ["Vector DB", "RAG", "Embeddings"], "category": "DATA CORE" },
+    { "name": "NUMPY", "status": "ONLINE", "experience": "3+ Years", "level": 70, "description": "Numerical computing library", "usedFor": ["Data Processing", "Math Operations"], "category": "DATA CORE" },
+    { "name": "PANDAS", "status": "ONLINE", "experience": "3+ Years", "level": 65, "description": "Data manipulation and analysis", "usedFor": ["Data Analysis", "CSV Processing"], "category": "DATA CORE" },
+    { "name": "GIT", "status": "ONLINE", "experience": "3+ Years", "level": 80, "description": "Version control system", "usedFor": ["Code Management", "Collaboration"], "category": "SHIP TOOLS" },
+    { "name": "GITHUB", "status": "ONLINE", "experience": "3+ Years", "level": 80, "description": "Code hosting platform", "usedFor": ["Repositories", "CI/CD", "Portfolio"], "category": "SHIP TOOLS" },
+    { "name": "DOCKER", "status": "LEARNING", "experience": "3+ Months", "level": 40, "description": "Containerization platform", "usedFor": ["Deployment", "Containers"], "category": "SHIP TOOLS" },
+    { "name": "VS CODE", "status": "ONLINE", "experience": "3+ Years", "level": 90, "description": "Primary code editor", "usedFor": ["Development", "Debugging", "Extensions"], "category": "SHIP TOOLS" },
+    { "name": "JUPYTER", "status": "ONLINE", "experience": "2+ Years", "level": 85, "description": "Interactive notebooks", "usedFor": ["Data Science", "Prototyping", "Visualization"], "category": "SHIP TOOLS" },
+    { "name": "LINUX", "status": "ONLINE", "experience": "2+ Years", "level": 65, "description": "Unix-based operating system", "usedFor": ["Development", "Servers", "CLI"], "category": "SHIP TOOLS" },
+    { "name": "PLAYWRIGHT", "status": "ONLINE", "experience": "1+ Years", "level": 55, "description": "Browser automation", "usedFor": ["Web Automation", "Testing", "Scraping"], "category": "AUTOMATION SUITE" },
+    { "name": "SELENIUM", "status": "ONLINE", "experience": "1+ Years", "level": 60, "description": "Browser automation", "usedFor": ["Web Automation", "Testing"], "category": "AUTOMATION SUITE" },
+    { "name": "BEAUTIFULSOUP", "status": "ONLINE", "experience": "2+ Years", "level": 70, "description": "Web scraping library", "usedFor": ["Scraping", "HTML Parsing"], "category": "AUTOMATION SUITE" },
+    { "name": "REQUESTS", "status": "ONLINE", "experience": "3+ Years", "level": 80, "description": "HTTP client library", "usedFor": ["API Calls", "Web Requests"], "category": "AUTOMATION SUITE" },
+    { "name": "HTML5", "status": "ONLINE", "experience": "3+ Years", "level": 85, "description": "Markup language for web pages", "usedFor": ["Web Structure", "Semantic HTML"], "category": "FRONTEND" },
+    { "name": "CSS3", "status": "ONLINE", "experience": "3+ Years", "level": 80, "description": "Styling and layout", "usedFor": ["Styling", "Responsive Design", "Animations"], "category": "FRONTEND" },
+    { "name": "THREE.JS", "status": "LEARNING", "experience": "3+ Months", "level": 40, "description": "3D graphics library", "usedFor": ["3D Rendering", "WebGL", "Visualization"], "category": "FRONTEND" }
+  ],
+
+  "asteroidBelt": [
+    "Python", "C", "C#", "JavaScript", "SQL",
+    "PyTorch", "TensorFlow", "Scikit-learn", "LangChain", "LangGraph",
+    "Hugging Face", "RAG", "NLP", "Deep Learning", "Computer Vision",
+    "OpenCV", "YOLO", "OCR", "NumPy", "Pandas", "Matplotlib",
+    "FastAPI", "Flask", "REST APIs", "WebSockets", "React",
+    "HTML5", "CSS3", "Three.js", "PostgreSQL", "SQLite", "MongoDB",
+    "FAISS", "ChromaDB", "Git", "GitHub", "Docker", "Jupyter Notebook",
+    "VS Code", "Linux", "Postman", "Playwright", "Selenium",
+    "BeautifulSoup", "Requests", "Render", "Vercel", "GitHub Actions",
+    "DSA", "OOP", "Multithreading", "Async Programming", "Agentic AI",
+    "Feature Engineering", "Data Preprocessing", "Software Design",
+    "Data Structures", "Algorithms", "Prompt Engineering"
+  ]
+}

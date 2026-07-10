@@ -7,6 +7,8 @@ export function Cursor() {
   useEffect(() => {
     let mx = 0, my = 0
     let dx = 0, dy = 0
+    let rafId = 0
+    let active = true
 
     const onMove = (e: MouseEvent) => {
       mx = e.clientX
@@ -17,19 +19,21 @@ export function Cursor() {
     }
 
     const loop = () => {
+      if (!active) return
       dx += (mx - dx) * 0.15
       dy += (my - dy) * 0.15
       if (ringRef.current) {
         ringRef.current.style.transform = `translate(${dx - 10}px, ${dy - 10}px)`
       }
-      requestAnimationFrame(loop)
+      rafId = requestAnimationFrame(loop)
     }
 
     window.addEventListener('mousemove', onMove)
-    const raf = requestAnimationFrame(loop)
+    rafId = requestAnimationFrame(loop)
     return () => {
+      active = false
       window.removeEventListener('mousemove', onMove)
-      cancelAnimationFrame(raf)
+      cancelAnimationFrame(rafId)
     }
   }, [])
 
@@ -37,10 +41,10 @@ export function Cursor() {
     <>
       {/* Real cursor hidden */}
       <style>{`* { cursor: none !important; }`}</style>
-      {/* Core dot — below cockpit panels (z-40) but above canvas */}
+      {/* Core dot — on top of everything */}
       <div
         ref={dotRef}
-        className="fixed top-0 left-0 z-[35] pointer-events-none"
+        className="fixed top-0 left-0 z-[9999] pointer-events-none"
         style={{
           width: 6,
           height: 6,
@@ -51,7 +55,7 @@ export function Cursor() {
       {/* Trailing ring */}
       <div
         ref={ringRef}
-        className="fixed top-0 left-0 z-[35] pointer-events-none"
+        className="fixed top-0 left-0 z-[9999] pointer-events-none"
         style={{
           width: 20,
           height: 20,

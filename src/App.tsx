@@ -6,7 +6,10 @@ import { useStore } from './store/useStore'
 import { TerminalText } from './components/TerminalText'
 import { Hub } from './pages/Hub'
 import { Profile } from './pages/Profile'
+import { TechStack } from './pages/TechStack'
+import { Projects } from './pages/Projects'
 import { Missions } from './pages/Missions'
+import { Learning } from './pages/Learning'
 import { CommsPanel } from './components/CommsPanel'
 import { SimpleView } from './pages/SimpleView'
 import { TerminalOverlay } from './components/TerminalOverlay'
@@ -36,7 +39,8 @@ function BootSequence() {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-void font-mono" style={{ color: 'var(--color-term-green)' }}>
       <div className="max-w-md w-full p-8 border shadow-glow-cyan animate-fade-in" style={{ borderColor: 'rgba(57,255,143,0.2)', background: 'rgba(10,15,28,0.9)', backdropFilter: 'blur(8px)' }}>
-        <h1 className="font-pixel text-2xl md:text-4xl text-center mb-8 text-white">JACKED IN</h1>
+        <h1 className="font-pixel text-2xl md:text-4xl text-center mb-2 text-white">VOYAGER-N</h1>
+        <p className="text-center text-[10px] font-mono mb-8" style={{ color: 'rgba(57,255,143,0.5)' }}>PILOT: NIHAL</p>
         <div className="space-y-4 text-sm md:text-base">
           <TerminalText text="> INITIALIZING SYSTEM..." />
           {step >= 1 && <div><TerminalText text="> MOUNTING VOLUMES... [OK]" delay={200} /></div>}
@@ -88,7 +92,10 @@ function App() {
           {currentView === 'boot' && !settings.simpleView && <BootSequence />}
           {currentView === 'hub' && !settings.simpleView && <Hub />}
           {currentView === 'profile' && !settings.simpleView && <Profile />}
+          {currentView === 'techstack' && !settings.simpleView && <TechStack />}
+          {currentView === 'projects' && !settings.simpleView && <Projects />}
           {currentView === 'missions' && !settings.simpleView && <Missions />}
+          {currentView === 'learning' && !settings.simpleView && <Learning />}
           {currentView === 'comms' && !settings.simpleView && <CommsPanel />}
         </>
       )}

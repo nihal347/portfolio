@@ -149,11 +149,19 @@ const COMMANDS: Record<string, (args: string[]) => TerminalLine[]> = {
     return [{ text: 'ERROR: Ship in transit.', type: 'error' }]
   },
 
-  resume: () => [
-    { text: '▶ INITIATING DOWNLOAD...', type: 'system' },
-    { text: '  Opening resume.pdf...', type: 'output' },
-    { text: '  DOWNLOAD COMPLETE', type: 'system' },
-  ],
+  resume: () => {
+    const link = document.createElement('a')
+    link.href = '/resume.pdf'
+    link.download = 'nihal_resume.pdf'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    return [
+      { text: '▶ INITIATING DOWNLOAD...', type: 'system' },
+      { text: '  Opening resume.pdf...', type: 'output' },
+      { text: '  DOWNLOAD COMPLETE', type: 'system' },
+    ]
+  },
 
   contact: () => {
     const store = useStore.getState()
@@ -188,7 +196,8 @@ const COMMANDS: Record<string, (args: string[]) => TerminalLine[]> = {
     { text: '', type: 'output' },
     { text: '  NAME:        Nihal', type: 'output' },
     { text: '  RANK:        AI Engineer', type: 'output' },
-    { text: '  VESSEL:      PORTFOLIO-CLASS', type: 'output' },
+    { text: '  VESSEL:      VOYAGER-N', type: 'output' },
+    { text: '  CLASS:       Explorer', type: 'output' },
     { text: '  MISSION:     Explore. Learn. Build.', type: 'output' },
   ],
 
@@ -205,15 +214,21 @@ const COMMANDS: Record<string, (args: string[]) => TerminalLine[]> = {
     ]
   },
 
-  github: () => [
-    { text: '▶ OPENING GITHUB...', type: 'system' },
-    { text: '  Launching github.com/nihal...', type: 'output' },
-  ],
+  github: () => {
+    window.open('https://github.com/Nihal347', '_blank')
+    return [
+      { text: '▶ OPENING GITHUB...', type: 'system' },
+      { text: '  Launching github.com/Nihal347...', type: 'output' },
+    ]
+  },
 
-  linkedin: () => [
-    { text: '▶ OPENING LINKEDIN...', type: 'system' },
-    { text: '  Launching linkedin.com/in/nihal...', type: 'output' },
-  ],
+  linkedin: () => {
+    window.open('https://www.linkedin.com/in/nihal-akndo/', '_blank')
+    return [
+      { text: '▶ OPENING LINKEDIN...', type: 'system' },
+      { text: '  Launching linkedin.com/in/nihal-akndo/...', type: 'output' },
+    ]
+  },
 }
 
 export default function Terminal() {

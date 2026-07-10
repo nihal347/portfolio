@@ -82,6 +82,8 @@ export class SpaceEngine {
   hoveredProjectIndex: number = -1;
   stars: {x: number, y: number, layer: number, brightness: number}[] = [];
   nebulaClouds: {x: number, y: number, radius: number, color: string, opacity: number}[] = [];
+  distantNebula = { x: 0, y: 0, radius: 500, color: [90, 50, 140], opacity: 0.18 };
+  galaxy: { x: number, y: number, stars: { angle: number, dist: number, arm: number, size: number, brightness: number }[], coreStars: { x: number, y: number, size: number, brightness: number }[] } = { x: 0, y: 0, stars: [], coreStars: [] };
   scrollY = 0;
   projectScrollY = 0;
   
@@ -126,6 +128,44 @@ export class SpaceEngine {
         radius: 100 + Math.random() * 200,
         color: ['rgba(40,20,80,', 'rgba(20,40,80,', 'rgba(60,20,40,', 'rgba(20,60,60,'][Math.floor(Math.random()*4)],
         opacity: 0.03 + Math.random() * 0.04
+      });
+    }
+
+    // Distant nebula — top-right corner, large soft glow
+    this.distantNebula.x = this.canvas.width * 0.82;
+    this.distantNebula.y = this.canvas.height * 0.18;
+    this.distantNebula.radius = Math.max(this.canvas.width, this.canvas.height) * 0.45;
+
+    // Pixelated galaxy — bottom-left corner
+    this.galaxy.x = this.canvas.width * 0.15;
+    this.galaxy.y = this.canvas.height * 0.82;
+    const galCenterX = this.canvas.width * 0.15;
+    const galCenterY = this.canvas.height * 0.82;
+    // Spiral arm stars
+    for (let arm = 0; arm < 3; arm++) {
+      const armOffset = (arm / 3) * Math.PI * 2;
+      for (let i = 0; i < 180; i++) {
+        const t = i / 180;
+        const dist = t * 160 + Math.random() * 30;
+        const spiralAngle = armOffset + t * Math.PI * 3 + (Math.random() - 0.5) * 0.6;
+        this.galaxy.stars.push({
+          angle: spiralAngle,
+          dist,
+          arm,
+          size: (1 - t * 0.6) * (1 + Math.floor(Math.random() * 2)),
+          brightness: 0.4 + Math.random() * 0.6
+        });
+      }
+    }
+    // Core glow stars
+    for (let i = 0; i < 80; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const d = Math.random() * 25;
+      this.galaxy.coreStars.push({
+        x: galCenterX + Math.cos(a) * d,
+        y: galCenterY + Math.sin(a) * d,
+        size: 1 + Math.floor(Math.random() * 2),
+        brightness: 0.5 + Math.random() * 0.5
       });
     }
 
@@ -196,20 +236,18 @@ export class SpaceEngine {
 
     // Tech stack asteroid belt between profile (185) and missions (275)
     const techStack = [
-      'Python', 'C', 'C#', 'HTML5', 'CSS3', 'JavaScript', 'SQL',
-      'Machine Learning', 'Deep Learning', 'Scikit-learn', 'TensorFlow', 'PyTorch',
-      'NumPy', 'Pandas', 'Matplotlib', 'Jupyter Notebook', 'Flask', 'FastAPI',
-      'REST API', 'React', 'MongoDB', 'SQLite', 'BeautifulSoup', 'Requests',
-      'Selenium', 'lxml', 'OpenCV', 'YOLO', 'Hugging Face', 'LangChain',
-      'Ollama', 'Whisper', 'GPT4All', 'Git', 'GitHub', 'VS Code',
-      'Cursor', 'Linux', 'Windows', 'Anaconda', 'pip', 'virtualenv',
-      'Docker', 'MLOps', 'Pillow', 'SpeechRecognition', 'PyAudio', 'playsound',
-      'PyGame', 'ESP32', 'Arduino IDE', 'Data Analysis', 'Data Preprocessing',
-      'Feature Engineering', 'Model Evaluation', 'Supervised Learning', 'Unsupervised Learning',
-      'Computer Vision', 'NLP', 'LLMs', 'Transformers', 'Prompt Engineering',
-      'Web Scraping', 'Automation', 'API Integration', 'Environment Variables',
-      'Gunicorn', 'Render', 'requirements.txt', 'OOP', 'Calculus',
-      'Linear Algebra', 'Probability & Statistics'
+      'Python', 'C', 'C#', 'JavaScript', 'SQL',
+      'PyTorch', 'TensorFlow', 'Scikit-learn', 'LangChain', 'LangGraph',
+      'Hugging Face', 'RAG', 'NLP', 'Deep Learning', 'Computer Vision',
+      'OpenCV', 'YOLO', 'OCR', 'NumPy', 'Pandas', 'Matplotlib',
+      'FastAPI', 'Flask', 'REST APIs', 'WebSockets', 'React',
+      'HTML5', 'CSS3', 'Three.js', 'PostgreSQL', 'SQLite', 'MongoDB',
+      'FAISS', 'ChromaDB', 'Git', 'GitHub', 'Docker', 'Jupyter Notebook',
+      'VS Code', 'Linux', 'Postman', 'Playwright', 'Selenium',
+      'BeautifulSoup', 'Requests', 'Render', 'Vercel', 'GitHub Actions',
+      'DSA', 'OOP', 'Multithreading', 'Async Programming', 'Agentic AI',
+      'Feature Engineering', 'Data Preprocessing', 'Software Design',
+      'Data Structures', 'Algorithms', 'Prompt Engineering'
     ];
     
     const beltRadius = 275;
@@ -233,33 +271,39 @@ export class SpaceEngine {
     // Tech stack satellites for zoomed view
     const techData = [
       { name: 'PYTHON', status: 'ONLINE', experience: '4+ Years', level: 90, description: 'Core language for AI/ML and automation', usedFor: ['Machine Learning', 'Automation', 'Backend', 'APIs', 'Data Analysis'], category: 'CORE SYSTEMS' },
-      { name: 'C', status: 'ONLINE', experience: '1+ Years', level: 40, description: 'Low-level systems programming', usedFor: ['Systems Programming', 'Performance'], category: 'CORE SYSTEMS' },
-      { name: 'C#', status: 'ONLINE', experience: '1+ Years', level: 35, description: 'Object-oriented application development', usedFor: ['Desktop Apps', 'Game Dev'], category: 'CORE SYSTEMS' },
-      { name: 'JAVASCRIPT', status: 'ONLINE', experience: '2+ Years', level: 60, description: 'Web development and scripting', usedFor: ['Frontend', 'Web Apps', 'Node.js'], category: 'CORE SYSTEMS' },
-      { name: 'SCIKIT-LEARN', status: 'ONLINE', experience: '2+ Years', level: 70, description: 'Machine learning library for Python', usedFor: ['ML Models', 'Data Mining', 'Classification'], category: 'AI MODULES' },
-      { name: 'PYTORCH', status: 'LEARNING', experience: '6+ Months', level: 35, description: 'Deep learning framework', usedFor: ['Neural Networks', 'Research'], category: 'AI MODULES' },
-      { name: 'TENSORFLOW', status: 'LEARNING', experience: '6+ Months', level: 30, description: 'Production ML platform', usedFor: ['Deep Learning', 'Deployment'], category: 'AI MODULES' },
-      { name: 'NUMPY', status: 'ONLINE', experience: '3+ Years', level: 80, description: 'Numerical computing library', usedFor: ['Data Processing', 'Math Operations'], category: 'AI MODULES' },
-      { name: 'PANDAS', status: 'ONLINE', experience: '3+ Years', level: 75, description: 'Data manipulation and analysis', usedFor: ['Data Analysis', 'CSV Processing'], category: 'AI MODULES' },
-      { name: 'OPENCV', status: 'ONLINE', experience: '2+ Years', level: 65, description: 'Computer vision library', usedFor: ['Image Processing', 'Object Detection'], category: 'AI MODULES' },
+      { name: 'C', status: 'ONLINE', experience: '1+ Years', level: 75, description: 'Low-level systems programming', usedFor: ['Systems Programming', 'Performance'], category: 'CORE SYSTEMS' },
+      { name: 'C#', status: 'ONLINE', experience: '1+ Years', level: 65, description: 'Object-oriented application development', usedFor: ['Desktop Apps', 'Game Dev'], category: 'CORE SYSTEMS' },
+      { name: 'JAVASCRIPT', status: 'ONLINE', experience: '2+ Years', level: 70, description: 'Web development and scripting', usedFor: ['Frontend', 'Web Apps', 'Node.js'], category: 'CORE SYSTEMS' },
+      { name: 'C#', status: 'ONLINE', experience: '1+ Years', level: 65, description: 'Object-oriented application development', usedFor: ['Desktop Apps', 'Game Dev', 'Unity'], category: 'CORE SYSTEMS' },
+      { name: 'SQL', status: 'ONLINE', experience: '2+ Years', level: 60, description: 'Database query language', usedFor: ['Data Queries', 'Database Management'], category: 'CORE SYSTEMS' },
+      { name: 'PYTORCH', status: 'ONLINE', experience: '1+ Years', level: 55, description: 'Deep learning framework', usedFor: ['Neural Networks', 'Research', 'Model Training'], category: 'AI MODULES' },
+      { name: 'TENSORFLOW', status: 'LEARNING', experience: '6+ Months', level: 45, description: 'Production ML platform', usedFor: ['Deep Learning', 'Deployment'], category: 'AI MODULES' },
+      { name: 'SCIKIT-LEARN', status: 'ONLINE', experience: '2+ Years', level: 60, description: 'Machine learning library for Python', usedFor: ['ML Models', 'Data Mining', 'Classification'], category: 'AI MODULES' },
+      { name: 'LANGCHAIN', status: 'ONLINE', experience: '1+ Years', level: 65, description: 'LLM application framework', usedFor: ['LLMs', 'RAG', 'Agents'], category: 'AI MODULES' },
       { name: 'HUGGING FACE', status: 'ONLINE', experience: '1+ Years', level: 55, description: 'Transformer models platform', usedFor: ['NLP', 'LLMs', 'Model Hub'], category: 'AI MODULES' },
+      { name: 'OPENCV', status: 'ONLINE', experience: '1+ Years', level: 60, description: 'Computer vision library', usedFor: ['Image Processing', 'Object Detection', 'OCR'], category: 'AI MODULES' },
+      { name: 'FASTAPI', status: 'ONLINE', experience: '1+ Years', level: 65, description: 'Modern async API framework', usedFor: ['REST APIs', 'Microservices', 'WebSockets'], category: 'WEB MODULES' },
       { name: 'FLASK', status: 'ONLINE', experience: '2+ Years', level: 70, description: 'Lightweight web framework', usedFor: ['APIs', 'Web Apps', 'Backends'], category: 'WEB MODULES' },
-      { name: 'FASTAPI', status: 'ONLINE', experience: '1+ Years', level: 60, description: 'Modern async API framework', usedFor: ['REST APIs', 'Microservices'], category: 'WEB MODULES' },
-      { name: 'STREAMLIT', status: 'ONLINE', experience: '1+ Years', level: 55, description: 'Rapid data app prototyping', usedFor: ['Data Apps', 'Dashboards', 'Prototyping'], category: 'WEB MODULES' },
-      { name: 'REST API', status: 'ONLINE', experience: '2+ Years', level: 70, description: 'API design and integration', usedFor: ['Web Services', 'Integration'], category: 'WEB MODULES' },
-      { name: 'MONGODB', status: 'ONLINE', experience: '1+ Years', level: 50, description: 'NoSQL document database', usedFor: ['Data Storage', 'Backend DB'], category: 'DATA CORE' },
-      { name: 'SQLITE', status: 'ONLINE', experience: '2+ Years', level: 60, description: 'Lightweight SQL database', usedFor: ['Local Storage', 'Embedded DB'], category: 'DATA CORE' },
+      { name: 'REACT', status: 'ONLINE', experience: '2+ Years', level: 75, description: 'Frontend UI library', usedFor: ['Web Apps', 'UI Components', 'SPA'], category: 'WEB MODULES' },
+      { name: 'POSTGRESQL', status: 'ONLINE', experience: '1+ Years', level: 55, description: 'Advanced relational database', usedFor: ['Data Storage', 'Backend DB'], category: 'DATA CORE' },
+      { name: 'MONGODB', status: 'LEARNING', experience: '6+ Months', level: 50, description: 'NoSQL document database', usedFor: ['Data Storage', 'Backend DB'], category: 'DATA CORE' },
+      { name: 'SQLITE', status: 'ONLINE', experience: '2+ Years', level: 65, description: 'Lightweight SQL database', usedFor: ['Local Storage', 'Embedded DB'], category: 'DATA CORE' },
+      { name: 'FAISS', status: 'LEARNING', experience: '3+ Months', level: 45, description: 'Vector similarity search', usedFor: ['Vector DB', 'RAG', 'Embeddings'], category: 'DATA CORE' },
+      { name: 'NUMPY', status: 'ONLINE', experience: '3+ Years', level: 70, description: 'Numerical computing library', usedFor: ['Data Processing', 'Math Operations'], category: 'DATA CORE' },
+      { name: 'PANDAS', status: 'ONLINE', experience: '3+ Years', level: 65, description: 'Data manipulation and analysis', usedFor: ['Data Analysis', 'CSV Processing'], category: 'DATA CORE' },
       { name: 'GIT', status: 'ONLINE', experience: '3+ Years', level: 80, description: 'Version control system', usedFor: ['Code Management', 'Collaboration'], category: 'SHIP TOOLS' },
-      { name: 'GITHUB', status: 'ONLINE', experience: '3+ Years', level: 75, description: 'Code hosting platform', usedFor: ['Repositories', 'CI/CD', 'Portfolio'], category: 'SHIP TOOLS' },
+      { name: 'GITHUB', status: 'ONLINE', experience: '3+ Years', level: 80, description: 'Code hosting platform', usedFor: ['Repositories', 'CI/CD', 'Portfolio'], category: 'SHIP TOOLS' },
+      { name: 'DOCKER', status: 'LEARNING', experience: '3+ Months', level: 40, description: 'Containerization platform', usedFor: ['Deployment', 'Containers'], category: 'SHIP TOOLS' },
       { name: 'VS CODE', status: 'ONLINE', experience: '3+ Years', level: 90, description: 'Primary code editor', usedFor: ['Development', 'Debugging', 'Extensions'], category: 'SHIP TOOLS' },
-      { name: 'JUPYTER', status: 'ONLINE', experience: '2+ Years', level: 70, description: 'Interactive notebooks', usedFor: ['Data Science', 'Prototyping', 'Visualization'], category: 'SHIP TOOLS' },
-      { name: 'DOCKER', status: 'LEARNING', experience: '3+ Months', level: 25, description: 'Containerization platform', usedFor: ['Deployment', 'Containers'], category: 'SHIP TOOLS' },
+      { name: 'JUPYTER', status: 'ONLINE', experience: '2+ Years', level: 85, description: 'Interactive notebooks', usedFor: ['Data Science', 'Prototyping', 'Visualization'], category: 'SHIP TOOLS' },
+      { name: 'LINUX', status: 'ONLINE', experience: '2+ Years', level: 65, description: 'Unix-based operating system', usedFor: ['Development', 'Servers', 'CLI'], category: 'SHIP TOOLS' },
+      { name: 'PLAYWRIGHT', status: 'ONLINE', experience: '1+ Years', level: 55, description: 'Browser automation', usedFor: ['Web Automation', 'Testing', 'Scraping'], category: 'AUTOMATION SUITE' },
+      { name: 'SELENIUM', status: 'ONLINE', experience: '1+ Years', level: 60, description: 'Browser automation', usedFor: ['Web Automation', 'Testing'], category: 'AUTOMATION SUITE' },
       { name: 'BEAUTIFULSOUP', status: 'ONLINE', experience: '2+ Years', level: 70, description: 'Web scraping library', usedFor: ['Scraping', 'HTML Parsing'], category: 'AUTOMATION SUITE' },
-      { name: 'REQUESTS', status: 'ONLINE', experience: '3+ Years', level: 85, description: 'HTTP client library', usedFor: ['API Calls', 'Web Requests'], category: 'AUTOMATION SUITE' },
-      { name: 'SELENIUM', status: 'ONLINE', experience: '1+ Years', level: 55, description: 'Browser automation', usedFor: ['Web Automation', 'Testing'], category: 'AUTOMATION SUITE' },
-      { name: 'HTML', status: 'ONLINE', experience: '3+ Years', level: 85, description: 'Markup language for web pages', usedFor: ['Web Structure', 'Semantic HTML'], category: 'FRONTEND' },
-      { name: 'CSS', status: 'ONLINE', experience: '3+ Years', level: 80, description: 'Styling and layout', usedFor: ['Styling', 'Responsive Design', 'Animations'], category: 'FRONTEND' },
-      { name: 'STREAMLIT', status: 'ONLINE', experience: '1+ Years', level: 55, description: 'Rapid data app prototyping', usedFor: ['Data Apps', 'Dashboards'], category: 'FRONTEND' },
+      { name: 'REQUESTS', status: 'ONLINE', experience: '3+ Years', level: 80, description: 'HTTP client library', usedFor: ['API Calls', 'Web Requests'], category: 'AUTOMATION SUITE' },
+      { name: 'HTML5', status: 'ONLINE', experience: '3+ Years', level: 85, description: 'Markup language for web pages', usedFor: ['Web Structure', 'Semantic HTML'], category: 'FRONTEND' },
+      { name: 'CSS3', status: 'ONLINE', experience: '3+ Years', level: 80, description: 'Styling and layout', usedFor: ['Styling', 'Responsive Design', 'Animations'], category: 'FRONTEND' },
+      { name: 'THREE.JS', status: 'LEARNING', experience: '3+ Months', level: 40, description: '3D graphics library', usedFor: ['3D Rendering', 'WebGL', 'Visualization'], category: 'FRONTEND' },
     ];
 
     const satOrbits = [50, 75, 100, 130, 160];
@@ -288,46 +332,39 @@ export class SpaceEngine {
     // Projects data
     this.projects = [
       {
-        name: 'SVJARVIS',
-        description: 'AI assistant with voice control, jarvis-style interface',
-        tech: ['Python', 'SpeechRecognition', 'OpenAI', 'PyAudio'],
-        github: 'https://github.com/nihal/SVJARVIS',
-        tags: ['AI', 'Voice', 'Python']
+        name: 'SIJI',
+        description: 'AI desktop assistant with voice interaction, LLMs, and automation',
+        tech: ['Python', 'FastAPI', 'Whisper', 'LangChain', 'FAISS', 'SQLite'],
+        github: 'https://github.com/Nihal347/SIJI',
+        tags: ['AI', 'Voice', 'LLMs']
       },
       {
-        name: 'SOULFRAME',
-        description: 'Souls-like game engine with AI enemies',
-        tech: ['Python', 'PyGame', 'AI/ML'],
-        github: 'https://github.com/nihal/SOULFRAME',
-        tags: ['Game', 'AI', 'Python']
+        name: 'VisionOS',
+        description: 'Computer vision platform with real-time detection and OCR',
+        tech: ['PyTorch', 'OpenCV', 'YOLO', 'FastAPI', 'React'],
+        github: 'https://github.com/Nihal347/VisionOS',
+        tags: ['CV', 'Detection', 'AI']
       },
       {
-        name: 'ESP32-WEATHER',
-        description: 'IoT weather station with ESP32',
-        tech: ['C++', 'ESP32', 'Arduino'],
-        github: 'https://github.com/nihal/ESP32-WEATHER',
-        tags: ['IoT', 'Hardware', 'C++']
+        name: 'AstroMind',
+        description: 'Space intelligence dashboard with NASA APIs and 3D viz',
+        tech: ['Python', 'React', 'Three.js', 'FastAPI', 'NASA APIs'],
+        github: 'https://github.com/Nihal347/AstroMind',
+        tags: ['Full-Stack', '3D', 'Data']
       },
       {
-        name: 'AUTOML',
-        description: 'Automated machine learning pipeline',
-        tech: ['Python', 'scikit-learn', 'Pandas'],
-        github: 'https://github.com/nihal/AUTOML',
-        tags: ['ML', 'Automation', 'Python']
+        name: 'Orbital',
+        description: 'N-body gravity simulator with CUDA and real-time viz',
+        tech: ['Python', 'OpenGL', 'CUDA', 'NumPy'],
+        github: 'https://github.com/Nihal347/Orbital',
+        tags: ['Physics', 'Simulation', 'GPU']
       },
       {
-        name: 'WEB-SRAPPER',
-        description: 'Web scraping toolkit with Selenium',
-        tech: ['Python', 'BeautifulSoup', 'Selenium'],
-        github: 'https://github.com/nihal/WEB-SRAPPER',
-        tags: ['Scraping', 'Automation', 'Python']
-      },
-      {
-        name: 'PORTFOLIO-SITE',
-        description: 'This space-themed portfolio website',
-        tech: ['TypeScript', 'React', 'Canvas'],
-        github: 'https://github.com/nihal/portfolio',
-        tags: ['Web', 'React', 'TypeScript']
+        name: 'Genesis',
+        description: 'AI civilization simulator with emergent behavior and ECS',
+        tech: ['Python', 'C++', 'PyTorch', 'OpenGL', 'ECS'],
+        github: 'https://github.com/Nihal347/Genesis',
+        tags: ['AI', 'Simulation', 'Algorithms']
       },
     ];
 
@@ -350,6 +387,63 @@ export class SpaceEngine {
   resize() {
       this.cx = this.canvas.width / 2;
       this.cy = this.canvas.height / 2;
+  }
+
+  async loadContent() {
+    try {
+      const res = await fetch('/content.json?t=' + Date.now())
+      if (!res.ok) return
+      const data = await res.json()
+
+      // Rebuild asteroids
+      this.asteroids = []
+      const beltRadius = 275
+      const asteroidNames: string[] = data.asteroidBelt || []
+      asteroidNames.forEach((name: string, i: number) => {
+        const angle = (i / asteroidNames.length) * Math.PI * 2
+        const speed = 0.08 + Math.random() * 0.04
+        const size = 2 + Math.random() * 2
+        const orbitOffset = (Math.random() - 0.5) * 20
+        this.asteroids.push({
+          name,
+          label: name,
+          orbitRadius: beltRadius + orbitOffset,
+          angle,
+          speed,
+          size,
+          x: this.cx + (beltRadius + orbitOffset) * Math.cos(angle),
+          y: this.cy + (beltRadius + orbitOffset) * Math.sin(angle),
+        })
+      })
+
+      // Rebuild satellites
+      this.satellites = []
+      const techData: any[] = data.satellites || []
+      const satOrbits = [50, 75, 100, 130, 160]
+      let catIndex = 0
+      let satInCat = 0
+      techData.forEach((tech: any, i: number) => {
+        if (i > 0 && tech.category !== techData[i - 1].category) {
+          catIndex = (catIndex + 1) % satOrbits.length
+          satInCat = 0
+        }
+        const orbitR = satOrbits[catIndex]
+        const angle = (satInCat / 6) * Math.PI * 2 + catIndex * 0.5
+        const speed = 0.15 + Math.random() * 0.1
+        this.satellites.push({
+          ...tech,
+          orbitRadius: orbitR,
+          angle,
+          speed,
+          size: 4,
+          x: 0,
+          y: 0,
+        })
+        satInCat++
+      })
+    } catch (err) {
+      console.error('Failed to load content for engine:', err)
+    }
   }
 
   openProjectLink() {
@@ -387,6 +481,93 @@ export class SpaceEngine {
       this.mouseY = y;
   }
 
+  private drawDistantNebula(t: number) {
+    const n = this.distantNebula;
+    const breathe = 1 + Math.sin(t * 0.0002) * 0.12;
+    const r = n.radius * breathe;
+    const [cr, cg, cb] = n.color;
+
+    // Wide outer glow
+    const g1 = this.ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, r);
+    g1.addColorStop(0, `rgba(${cr},${cg},${cb},${n.opacity})`);
+    g1.addColorStop(0.15, `rgba(${cr},${cg},${cb},${n.opacity * 0.8})`);
+    g1.addColorStop(0.4, `rgba(${cr},${cg},${cb},${n.opacity * 0.35})`);
+    g1.addColorStop(0.7, `rgba(${cr},${cg},${cb},${n.opacity * 0.1})`);
+    g1.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
+    this.ctx.fillStyle = g1;
+    this.ctx.beginPath();
+    this.ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+    this.ctx.fill();
+
+    // Inner core — brighter pink/magenta wisp
+    const shift = Math.sin(t * 0.00015) * 0.5 + 0.5;
+    const coreR = Math.floor(120 + shift * 60);
+    const coreG = Math.floor(40 + (1 - shift) * 30);
+    const coreB = Math.floor(130 + shift * 50);
+    const g2 = this.ctx.createRadialGradient(n.x - r * 0.1, n.y + r * 0.05, 0, n.x, n.y, r * 0.4);
+    g2.addColorStop(0, `rgba(${coreR},${coreG},${coreB},${n.opacity * 1.5})`);
+    g2.addColorStop(0.4, `rgba(${coreR},${coreG},${coreB},${n.opacity * 0.6})`);
+    g2.addColorStop(1, `rgba(${coreR},${coreG},${coreB},0)`);
+    this.ctx.fillStyle = g2;
+    this.ctx.beginPath();
+    this.ctx.arc(n.x, n.y, r * 0.4, 0, Math.PI * 2);
+    this.ctx.fill();
+  }
+
+  private drawGalaxy(t: number) {
+    const g = this.galaxy;
+    const rotation = t * 0.00003;
+    const cx = g.x;
+    const cy = g.y;
+
+    // Soft core glow
+    const coreGrad = this.ctx.createRadialGradient(cx, cy, 0, cx, cy, 30);
+    coreGrad.addColorStop(0, 'rgba(200,180,255,0.12)');
+    coreGrad.addColorStop(0.5, 'rgba(150,120,200,0.05)');
+    coreGrad.addColorStop(1, 'rgba(100,80,150,0)');
+    this.ctx.fillStyle = coreGrad;
+    this.ctx.beginPath();
+    this.ctx.arc(cx, cy, 30, 0, Math.PI * 2);
+    this.ctx.fill();
+
+    // Core stars — bright pixel cluster
+    this.galaxy.coreStars.forEach(s => {
+      const flicker = 0.7 + Math.sin(t * 0.005 + s.x * 0.1) * 0.3;
+      const alpha = s.brightness * flicker;
+      this.ctx.fillStyle = `rgba(220,210,255,${alpha.toFixed(2)})`;
+      this.ctx.fillRect(Math.floor(s.x), Math.floor(s.y), s.size, s.size);
+    });
+
+    // Spiral arm stars — pixelated
+    const armColors = [
+      [140, 160, 255],  // blue
+      [180, 140, 220],  // purple
+      [200, 170, 140],  // warm
+    ];
+
+    g.stars.forEach(s => {
+      const a = s.angle + rotation;
+      const px = cx + Math.cos(a) * s.dist;
+      const py = cy + Math.sin(a) * s.dist * 0.55; // elliptical tilt
+      const flicker = 0.6 + Math.sin(t * 0.003 + s.dist * 0.05) * 0.4;
+      const alpha = s.brightness * flicker * 0.7;
+      const c = armColors[s.arm];
+      this.ctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${alpha.toFixed(2)})`;
+      this.ctx.fillRect(Math.floor(px), Math.floor(py), s.size, s.size);
+    });
+
+    // Dust lane hint — darker arc between arms
+    this.ctx.save();
+    this.ctx.globalAlpha = 0.04;
+    this.ctx.fillStyle = '#000000';
+    this.ctx.beginPath();
+    this.ctx.arc(cx, cy, 60, rotation + 1, rotation + 2.5);
+    this.ctx.arc(cx, cy, 20, rotation + 2.5, rotation + 1, true);
+    this.ctx.closePath();
+    this.ctx.fill();
+    this.ctx.restore();
+  }
+
   update(dt: number) {
     // Planets
     this.bodies.forEach(b => {
@@ -414,7 +595,7 @@ export class SpaceEngine {
     });
   }
 
-  draw(t: number, drawLabels = true, showOrbits = true, radarActive = false) {
+  draw(t: number, drawLabels = true, showOrbits = true, radarActive = false, scanActive = false) {
     const W = this.canvas.width;
     const H = this.canvas.height;
     
@@ -425,6 +606,9 @@ export class SpaceEngine {
     bgGrad.addColorStop(1, 'rgba(2,3,8,1)');
     this.ctx.fillStyle = bgGrad;
     this.ctx.fillRect(0, 0, W, H);
+
+    // Distant nebula for depth
+    this.drawDistantNebula(t);
 
     // Nebula clouds for depth
     this.nebulaClouds.forEach(cloud => {
@@ -478,9 +662,8 @@ export class SpaceEngine {
     // Inner sun glow
     const sunGrad = this.ctx.createRadialGradient(this.cx, this.cy, 2, this.cx, this.cy, 30*pulse);
     sunGrad.addColorStop(0, 'rgba(255,240,200,1)');
-    sunGrad.addColorStop(0.3, 'rgba(255,200,100,0.9)');
-    sunGrad.addColorStop(0.6, 'rgba(255,150,50,0.5)');
-    sunGrad.addColorStop(1, 'rgba(255,100,20,0)');
+    sunGrad.addColorStop(0.4, 'rgba(255,180,50,0.8)');
+    sunGrad.addColorStop(1, 'rgba(255,100,0,0)');
     this.ctx.fillStyle = sunGrad;
     this.ctx.beginPath();
     this.ctx.arc(this.cx, this.cy, 30*pulse, 0, Math.PI*2);
@@ -496,6 +679,33 @@ export class SpaceEngine {
     this.ctx.fillStyle = 'rgba(255,220,150,0.6)';
     this.ctx.fillRect(this.cx - 2, this.cy - 3, 2, 2);
     this.ctx.fillRect(this.cx + 2, this.cy + 1, 2, 2);
+
+    // Scan pulse
+    if (scanActive) {
+      const scanRadius = (t % 3000) / 3000 * Math.max(W, H);
+      this.ctx.save();
+      this.ctx.beginPath();
+      this.ctx.arc(this.cx, this.cy, scanRadius, 0, Math.PI * 2);
+      this.ctx.strokeStyle = `rgba(57, 255, 143, ${1 - scanRadius / Math.max(W, H)})`;
+      this.ctx.lineWidth = 4;
+      this.ctx.stroke();
+      this.ctx.restore();
+      
+      // Highlight bodies during scan
+      this.bodies.forEach(b => {
+         const d = Math.hypot(b.x - this.cx, b.y - this.cy);
+         if (Math.abs(d - scanRadius) < 30) {
+            this.ctx.shadowBlur = 15;
+            this.ctx.shadowColor = '#39ff8f';
+            this.ctx.strokeStyle = '#ffffff';
+            this.ctx.lineWidth = 2;
+            this.ctx.beginPath();
+            this.ctx.arc(b.x, b.y, b.radius + 5, 0, Math.PI * 2);
+            this.ctx.stroke();
+            this.ctx.shadowBlur = 0;
+         }
+      });
+    }
 
     // Radar sweep
     if (radarActive) {
@@ -711,6 +921,27 @@ export class SpaceEngine {
     // Planet
     const pulse = 1 + Math.sin(t / 600) * 0.03;
     const planetR = 50 * pulse;
+    
+    // Tech rings (Outer data rings)
+    this.ctx.save();
+    this.ctx.translate(cx, cy);
+    this.ctx.rotate(t / 2000);
+    this.ctx.strokeStyle = 'rgba(57,255,143,0.5)';
+    this.ctx.lineWidth = 1.5;
+    this.ctx.setLineDash([8, 12, 25, 10, 4, 15, 40, 15]);
+    this.ctx.beginPath();
+    this.ctx.arc(0, 0, planetR + 35, 0, Math.PI * 2);
+    this.ctx.stroke();
+    
+    this.ctx.rotate(-t / 800);
+    this.ctx.strokeStyle = 'rgba(57,255,143,0.3)';
+    this.ctx.setLineDash([4, 6, 12, 8]);
+    this.ctx.beginPath();
+    this.ctx.arc(0, 0, planetR + 20, 0, Math.PI * 2);
+    this.ctx.stroke();
+    this.ctx.restore();
+
+    // Base Planet
     const planetGrad = this.ctx.createRadialGradient(cx - 15, cy - 15, 0, cx, cy, planetR);
     planetGrad.addColorStop(0, '#e8c56a');
     planetGrad.addColorStop(0.5, '#c49a3c');
@@ -720,10 +951,67 @@ export class SpaceEngine {
     this.ctx.arc(cx, cy, planetR, 0, Math.PI * 2);
     this.ctx.fill();
 
+    // Tech surface lines (Circuitry/Grid overlay)
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.arc(cx, cy, planetR, 0, Math.PI * 2);
+    this.ctx.clip();
+    
+    this.ctx.strokeStyle = 'rgba(57,255,143,0.2)';
+    this.ctx.lineWidth = 1;
+    
+    // Draw a curved grid to simulate a sphere
+    for(let i = -45; i <= 45; i+= 15) {
+      this.ctx.beginPath();
+      // Vertical curves
+      this.ctx.ellipse(cx, cy, Math.max(0.1, Math.abs(i)), planetR, 0, 0, Math.PI * 2);
+      this.ctx.stroke();
+      // Horizontal curves
+      this.ctx.beginPath();
+      this.ctx.ellipse(cx, cy, planetR, Math.max(0.1, Math.abs(i)), 0, 0, Math.PI * 2);
+      this.ctx.stroke();
+    }
+    
+    // Glowing tech nodes on the surface
+    this.ctx.fillStyle = '#39ff8f';
+    const nodes = [
+       {x: -25, y: -15}, {x: 10, y: -30}, {x: 25, y: 10}, {x: -15, y: 25}, {x: 5, y: 5}
+    ];
+    nodes.forEach((n, idx) => {
+       const nx = cx + n.x;
+       const ny = cy + n.y;
+       
+       // Pulse effect for nodes
+       const nodePulse = 1 + Math.sin(t / 200 + idx) * 0.5;
+       
+       this.ctx.beginPath();
+       this.ctx.arc(nx, ny, 2, 0, Math.PI*2);
+       this.ctx.fill();
+       
+       this.ctx.beginPath();
+       this.ctx.arc(nx, ny, 4 * nodePulse, 0, Math.PI*2);
+       this.ctx.strokeStyle = 'rgba(57,255,143,0.6)';
+       this.ctx.stroke();
+    });
+    
+    // Connect nodes with circuit lines
+    this.ctx.beginPath();
+    this.ctx.moveTo(cx + nodes[0].x, cy + nodes[0].y);
+    this.ctx.lineTo(cx + nodes[4].x, cy + nodes[4].y);
+    this.ctx.lineTo(cx + nodes[1].x, cy + nodes[1].y);
+    this.ctx.lineTo(cx + nodes[2].x, cy + nodes[2].y);
+    this.ctx.lineTo(cx + nodes[4].x, cy + nodes[4].y);
+    this.ctx.lineTo(cx + nodes[3].x, cy + nodes[3].y);
+    this.ctx.strokeStyle = 'rgba(57,255,143,0.5)';
+    this.ctx.lineWidth = 1.5;
+    this.ctx.stroke();
+
+    this.ctx.restore();
+
     // Planet glow
-    this.ctx.shadowBlur = 30;
-    this.ctx.shadowColor = '#c49a3c';
-    this.ctx.strokeStyle = 'rgba(196,154,60,0.3)';
+    this.ctx.shadowBlur = 40;
+    this.ctx.shadowColor = '#39ff8f';
+    this.ctx.strokeStyle = 'rgba(57,255,143,0.3)';
     this.ctx.lineWidth = 2;
     this.ctx.beginPath();
     this.ctx.arc(cx, cy, planetR + 5, 0, Math.PI * 2);
@@ -957,6 +1245,9 @@ export class SpaceEngine {
     bgGrad.addColorStop(1, 'rgba(2,3,8,1)');
     this.ctx.fillStyle = bgGrad;
     this.ctx.fillRect(0, 0, W, H);
+
+    // Distant nebula for depth
+    this.drawDistantNebula(t);
 
     this.nebulaClouds.forEach(cloud => {
       const grad = this.ctx.createRadialGradient(cloud.x, cloud.y, 0, cloud.x, cloud.y, cloud.radius);
