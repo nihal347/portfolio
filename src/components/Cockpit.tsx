@@ -3,6 +3,16 @@ import { useStore } from '../store/useStore'
 import { GitBranch, Mail, ExternalLink, FileDown } from 'lucide-react'
 import { playClick } from '../hooks/useSound'
 
+function useIsMobile() {
+  const [m, setM] = useState(() => window.innerWidth < 768)
+  useEffect(() => {
+    const h = () => setM(window.innerWidth < 768)
+    window.addEventListener('resize', h)
+    return () => window.removeEventListener('resize', h)
+  }, [])
+  return m
+}
+
 const ROLES = [
   'CALLSIGN: NIHAL',
   'CLASS: FULL-STACK',
@@ -63,6 +73,7 @@ function CtrlBtn({
 }
 
 export function Cockpit() {
+  const isMobile = useIsMobile()
   const exploration = useStore(s => s.exploration)
   const toggleSound = useStore(s => s.toggleSound)
   const toggleSimpleView = useStore(s => s.toggleSimpleView)
@@ -170,9 +181,10 @@ export function Cockpit() {
 
   return (
     <>
-      <div className="cockpit-frame" />
+      {!isMobile && <div className="cockpit-frame" />}
 
       {/* Hex corner accents */}
+      {!isMobile && <>
       <div className="cockpit-hex-corner cockpit-hex-corner--tl">
         <svg viewBox="0 0 80 80" fill="none">
           <path d="M0 40 L20 20 L40 0" stroke="#39ff8f" strokeWidth="1" opacity="0.4" />
@@ -215,6 +227,7 @@ export function Cockpit() {
       <div className="cockpit-hex-edge cockpit-hex-edge--bottom" />
       <div className="cockpit-hex-edge cockpit-hex-edge--left" />
       <div className="cockpit-hex-edge cockpit-hex-edge--right" />
+      </>}
 
       <div className="fixed inset-0 z-40 pointer-events-none" style={{ transform: `translate(${(mousePos.x - 0.5) * 15}px, ${(mousePos.y - 0.5) * 15}px)` }}>
         {/* ═══ HEADER ═══ */}
@@ -227,6 +240,7 @@ export function Cockpit() {
           </div>
         </div>
 
+        {!isMobile && (<>
         {/* ═══ TOP LEFT — SHIP STATUS ═══ */}
         <div className="floating-box absolute top-12 left-4" style={{ minWidth: '160px' }}>
           <div className="fb-title">SHIP STATUS</div>
@@ -331,6 +345,7 @@ export function Cockpit() {
           </div>
         </div>
         )}
+        </>)}
 
         {/* ═══ Travel overlay ═══ */}
         {isAnimating && (
@@ -357,7 +372,7 @@ export function Cockpit() {
       </div>
 
       {/* ═══ COCKPIT VIEWPORT ═══ */}
-      <div className="fixed inset-0 z-30 pointer-events-none" style={{
+      {!isMobile && <div className="fixed inset-0 z-30 pointer-events-none" style={{
         opacity: showViewport ? 1 : 0,
         transform: showViewport ? 'scale(1)' : 'scale(3)',
         transition: 'opacity 0.8s ease-in-out, transform 0.8s ease-in-out'
@@ -389,7 +404,7 @@ export function Cockpit() {
             <div className="absolute -bottom-[1px] -right-[1px] w-3 h-3 border-b-2 border-r-2 border-[#39ff8f]/60" />
           </div>
         </div>
-      </div>
+      </div>}
     </>
   )
 }

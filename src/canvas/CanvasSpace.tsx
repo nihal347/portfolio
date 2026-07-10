@@ -113,17 +113,10 @@ export function CanvasSpace() {
         e.preventDefault();
         const dist = getPinchDist(e.touches);
         if (lastPinchDist > 0) {
-          const delta = dist - lastPinchDist;
+          const ratio = dist / lastPinchDist;
           const state = useStore.getState();
-          const levels = [0.4, 0.65, 1, 1.5, 2];
-          const current = state.controls.zoom;
-          const idx = levels.indexOf(current);
-          if (delta > 8 && idx < levels.length - 1) {
-            useStore.getState().cycleZoom();
-          } else if (delta < -8 && idx > 0) {
-            const prev = levels[(idx - 1 + levels.length) % levels.length];
-            useStore.setState({ controls: { ...state.controls, zoom: prev } });
-          }
+          const newZoom = Math.min(2, Math.max(0.3, state.controls.zoom * ratio));
+          useStore.setState({ controls: { ...state.controls, zoom: Math.round(newZoom * 100) / 100 } });
         }
         lastPinchDist = dist;
         return;
