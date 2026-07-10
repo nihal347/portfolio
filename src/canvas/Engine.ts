@@ -625,6 +625,11 @@ export class SpaceEngine {
   }
 
   draw(t: number, drawLabels = true, showOrbits = true, radarActive = false, scanActive = false) {
+    this.drawBackground(t, radarActive, scanActive);
+    this.drawForeground(t, drawLabels, showOrbits, radarActive, scanActive);
+  }
+
+  drawBackground(t: number, _radarActive = false, _scanActive = false) {
     const W = this.canvas.width;
     const H = this.canvas.height;
     
@@ -708,6 +713,11 @@ export class SpaceEngine {
     this.ctx.fillStyle = 'rgba(255,220,150,0.6)';
     this.ctx.fillRect(this.cx - 2, this.cy - 3, 2, 2);
     this.ctx.fillRect(this.cx + 2, this.cy + 1, 2, 2);
+  }
+
+  drawForeground(t: number, drawLabels = true, showOrbits = true, radarActive = false, scanActive = false) {
+    const W = this.canvas.width;
+    const H = this.canvas.height;
 
     // Scan pulse
     if (scanActive) {

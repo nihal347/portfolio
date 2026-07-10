@@ -342,6 +342,9 @@ export function CanvasSpace() {
         } else {
           engine.update(dt * (controls.timeSpeed ?? 1));
           
+          // Draw background at full screen (no zoom)
+          engine.drawBackground(time, controls.radar ?? false, controls.scanActive ?? false);
+          
           ctx.save();
           let camX = W / 2;
           let camY = H / 2;
@@ -357,7 +360,7 @@ export function CanvasSpace() {
           ctx.scale(currentZoom, currentZoom);
           ctx.translate(-camX, -camY);
 
-          engine.draw(time, controls.labels ?? true, controls.orbits ?? true, controls.radar ?? false, controls.scanActive ?? false);
+          engine.drawForeground(time, controls.labels ?? true, controls.orbits ?? true, controls.radar ?? false, controls.scanActive ?? false);
           ctx.restore();
         }
       }
