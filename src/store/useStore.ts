@@ -96,7 +96,7 @@ export const useStore = create<AppState>()(
         easterEgg: false,
       },
       settings: {
-        soundEnabled: false,
+        soundEnabled: true,
         simpleView: false,
       },
       controls: {
@@ -172,7 +172,7 @@ export const useStore = create<AppState>()(
       },
 
       cycleZoom: () => {
-        const levels = [1, 1.5, 2, 3]
+        const levels = [0.65, 1, 1.5, 2]
         const current = get().controls.zoom
         const idx = levels.indexOf(current)
         const next = levels[(idx + 1) % levels.length]
@@ -242,7 +242,7 @@ export const useStore = create<AppState>()(
           controls: {
             radar: false,
             track: false,
-            zoom: 1,
+        zoom: 0.65,
             orbits: true,
             labels: true,
             timeSpeed: 1,

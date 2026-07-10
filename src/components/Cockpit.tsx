@@ -350,7 +350,8 @@ export function Cockpit() {
         </div>
         )}
         </>) : (
-        /* ═══ MOBILE — minimal header ═══ */
+        /* ═══ MOBILE — header + bottom buttons ═══ */
+        <>
         <div className="absolute top-0 left-0 right-0 h-10 flex items-center justify-center z-10" style={{
           background: 'linear-gradient(to bottom, rgba(2,3,8,0.95), transparent)',
         }}>
@@ -358,6 +359,21 @@ export function Cockpit() {
             VOYAGER-N / {targetSector}
           </div>
         </div>
+        <div className="absolute bottom-0 left-0 right-0 z-10 pointer-events-auto" style={{
+          background: 'linear-gradient(to top, rgba(2,3,8,0.95), transparent)',
+          padding: '12px 8px 16px',
+        }}>
+          <div className="flex justify-center gap-1.5 flex-wrap">
+            <button onClick={() => { playClick(); toggleSound() }} className="fb-square-btn" style={settings.soundEnabled ? { color: '#39ff8f', borderColor: 'rgba(57,255,143,0.5)' } : { color: '#ff3939', borderColor: 'rgba(255,57,57,0.3)' }}>SFX {settings.soundEnabled ? 'ON' : 'OFF'}</button>
+            <button onClick={() => { playClick(); toggleRadar() }} className="fb-square-btn" style={controls.radar ? { color: '#39ff8f', borderColor: 'rgba(57,255,143,0.5)' } : { color: '#ff3939', borderColor: 'rgba(255,57,57,0.3)' }}>RADAR</button>
+            <button onClick={() => { playClick(); toggleLabels() }} className="fb-square-btn" style={controls.labels ? { color: '#39ff8f', borderColor: 'rgba(57,255,143,0.5)' } : { color: '#ff3939', borderColor: 'rgba(255,57,57,0.3)' }}>LABELS</button>
+            <button onClick={() => { playClick(); cycleZoom() }} className="fb-square-btn">ZOOM</button>
+            <a href="https://github.com/Nihal347" target="_blank" rel="noreferrer" className="fb-square-btn"><GitBranch size={10} /> GIT</a>
+            <a href="mailto:nihalakndo321@gmail.com" className="fb-square-btn"><Mail size={10} /> MAIL</a>
+            <button onClick={() => { playClick(); toggleTerminal() }} className="fb-square-btn">TERM</button>
+          </div>
+        </div>
+        </>
         )}
 
         {/* ═══ Travel overlay ═══ */}
