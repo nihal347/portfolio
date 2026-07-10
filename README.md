@@ -125,7 +125,7 @@ This portfolio is designed as a Single Page Application (SPA) with a focus on co
 Clone the repository.
 
 ```bash
-git clone https://github.com/your-username/portfolio.git
+git clone https://github.com/Nihal347/portfolio.git
 ```
 
 Navigate to the project directory.
@@ -153,7 +153,7 @@ npm run dev
 The application will be available at:
 
 ```
-https://nihal347.github.io/portfolio/
+https://nihal347.github.io/portfolio
 ```
 
 ---
@@ -205,23 +205,9 @@ The project separates presentation, content, and interaction logic to improve ma
 
 ---
 
-## Future Improvements
-
-- Command-driven terminal navigation
-- Internationalization (i18n)
-- Theme customization
-- Accessibility improvements
-- Project filtering and search
-- Interactive project case studies
-- Performance analytics
-- Progressive Web App (PWA) support
-
----
-
 ## Live Demo
 
-https://your-website.com
-
+https://nihal347.github.io/portfolio
 ---
 
 ## Author
@@ -230,9 +216,9 @@ https://your-website.com
 
 Machine Learning Engineer | AI Developer | Computer Vision Enthusiast
 
-GitHub: https://github.com/your-username
+GitHub: https://github.com/Nihal347
 
-LinkedIn: https://linkedin.com/in/your-profile
+LinkedIn: https://linkedin.com/in/nihal-akndo
 
 ---
 
