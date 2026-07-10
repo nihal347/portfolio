@@ -334,37 +334,65 @@ export class SpaceEngine {
       {
         name: 'SIJI',
         description: 'AI desktop assistant with voice interaction, LLMs, and automation',
-        tech: ['Python', 'FastAPI', 'Whisper', 'LangChain', 'FAISS', 'SQLite'],
+        tech: ['Python', 'FastAPI', 'LangChain'],
         github: 'https://github.com/Nihal347/SIJI',
-        tags: ['AI', 'Voice', 'LLMs']
+        tags: ['AI', 'Assistant', 'LLMs']
       },
       {
-        name: 'VisionOS',
-        description: 'Computer vision platform with real-time detection and OCR',
-        tech: ['PyTorch', 'OpenCV', 'YOLO', 'FastAPI', 'React'],
-        github: 'https://github.com/Nihal347/VisionOS',
-        tags: ['CV', 'Detection', 'AI']
-      },
-      {
-        name: 'AstroMind',
-        description: 'Space intelligence dashboard with NASA APIs and 3D viz',
-        tech: ['Python', 'React', 'Three.js', 'FastAPI', 'NASA APIs'],
-        github: 'https://github.com/Nihal347/AstroMind',
-        tags: ['Full-Stack', '3D', 'Data']
+        name: 'genesis',
+        description: 'AI civilization simulator with emergent behavior',
+        tech: ['Python', 'PyTorch', 'OpenGL'],
+        github: 'https://github.com/Nihal347/genesis',
+        tags: ['AI', 'Simulation', 'Algorithms']
       },
       {
         name: 'Orbital',
-        description: 'N-body gravity simulator with CUDA and real-time viz',
-        tech: ['Python', 'OpenGL', 'CUDA', 'NumPy'],
+        description: 'N-body gravity simulator with real-time visualization',
+        tech: ['Python', 'OpenGL', 'NumPy'],
         github: 'https://github.com/Nihal347/Orbital',
         tags: ['Physics', 'Simulation', 'GPU']
       },
       {
-        name: 'Genesis',
-        description: 'AI civilization simulator with emergent behavior and ECS',
-        tech: ['Python', 'C++', 'PyTorch', 'OpenGL', 'ECS'],
-        github: 'https://github.com/Nihal347/Genesis',
-        tags: ['AI', 'Simulation', 'Algorithms']
+        name: 'ASTROmind',
+        description: 'Space intelligence dashboard with NASA APIs and 3D visualization',
+        tech: ['Python', 'React', 'Three.js', 'FastAPI'],
+        github: 'https://github.com/Nihal347/ASTROmind',
+        tags: ['Full-Stack', '3D', 'Space']
+      },
+      {
+        name: 'vision-OS',
+        description: 'Computer vision platform with real-time detection and OCR',
+        tech: ['Python', 'OpenCV', 'YOLO', 'FastAPI', 'React'],
+        github: 'https://github.com/Nihal347/vision-OS',
+        tags: ['CV', 'Detection', 'AI']
+      },
+      {
+        name: 'Fake-News-Detection-System',
+        description: 'Machine learning model that can detect fake news',
+        tech: ['Python', 'Jupyter Notebook', 'Scikit-learn'],
+        github: 'https://github.com/Nihal347/Fake-News-Detection-System',
+        tags: ['ML', 'NLP', 'Classification']
+      },
+      {
+        name: 'sentiment-analysis',
+        description: 'Movie review sentiment analysis with Naive Bayes using 50K IMDB reviews',
+        tech: ['Python', 'NLP', 'Scikit-learn'],
+        github: 'https://github.com/Nihal347/sentiment-analysis',
+        tags: ['NLP', 'Sentiment', 'ML']
+      },
+      {
+        name: 'banking-system',
+        description: 'Small banking system built in Python',
+        tech: ['Python'],
+        github: 'https://github.com/Nihal347/banking-system',
+        tags: ['Python', 'Backend', 'Finance']
+      },
+      {
+        name: 'automation-projects',
+        description: 'Collection of automation projects and scripts',
+        tech: ['Python', 'Selenium', 'BeautifulSoup'],
+        github: 'https://github.com/Nihal347/automation-projects',
+        tags: ['Automation', 'Scraping', 'Scripts']
       },
     ];
 

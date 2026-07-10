@@ -37,61 +37,109 @@ const PINNED_PROJECTS: Project[] = [
     id: 'siji',
     name: 'SIJI',
     description: 'AI desktop assistant with voice interaction, LLMs, and automation',
-    tech: ['Python', 'FastAPI', 'Whisper', 'LangChain', 'FAISS', 'SQLite'],
+    tech: ['Python', 'FastAPI', 'LangChain'],
     github: `https://github.com/${GITHUB_USERNAME}/SIJI`,
     live: '',
-    year: '2025',
-    stars: 0,
+    year: '2026',
+    stars: 1,
     language: 'Python',
-    topics: ['ai', 'voice', 'llm']
+    topics: ['ai', 'assistant', 'llm']
   },
   {
-    id: 'visionos',
-    name: 'VisionOS',
-    description: 'Computer vision platform with real-time detection and OCR',
-    tech: ['PyTorch', 'OpenCV', 'YOLO', 'FastAPI', 'React'],
-    github: `https://github.com/${GITHUB_USERNAME}/VisionOS`,
+    id: 'genesis',
+    name: 'genesis',
+    description: 'AI civilization simulator with emergent behavior',
+    tech: ['Python', 'PyTorch', 'OpenGL'],
+    github: `https://github.com/${GITHUB_USERNAME}/genesis`,
     live: '',
-    year: '2025',
+    year: '2026',
     stars: 0,
     language: 'Python',
-    topics: ['computer-vision', 'ai', 'detection']
-  },
-  {
-    id: 'astromind',
-    name: 'AstroMind',
-    description: 'Space intelligence dashboard with NASA APIs and 3D viz',
-    tech: ['Python', 'React', 'Three.js', 'FastAPI', 'NASA APIs'],
-    github: `https://github.com/${GITHUB_USERNAME}/AstroMind`,
-    live: '',
-    year: '2025',
-    stars: 0,
-    language: 'Python',
-    topics: ['full-stack', '3d', 'space']
+    topics: ['ai', 'simulation', 'algorithms']
   },
   {
     id: 'orbital',
     name: 'Orbital',
-    description: 'N-body gravity simulator with CUDA and real-time viz',
-    tech: ['Python', 'OpenGL', 'CUDA', 'NumPy'],
+    description: 'N-body gravity simulator with real-time visualization',
+    tech: ['Python', 'OpenGL', 'NumPy'],
     github: `https://github.com/${GITHUB_USERNAME}/Orbital`,
     live: '',
-    year: '2025',
+    year: '2026',
     stars: 0,
     language: 'Python',
     topics: ['physics', 'simulation', 'gpu']
   },
   {
-    id: 'genesis',
-    name: 'Genesis',
-    description: 'AI civilization simulator with emergent behavior and ECS',
-    tech: ['Python', 'C++', 'PyTorch', 'OpenGL', 'ECS'],
-    github: `https://github.com/${GITHUB_USERNAME}/Genesis`,
+    id: 'astromind',
+    name: 'ASTROmind',
+    description: 'Space intelligence dashboard with NASA APIs and 3D visualization',
+    tech: ['Python', 'React', 'Three.js', 'FastAPI'],
+    github: `https://github.com/${GITHUB_USERNAME}/ASTROmind`,
+    live: '',
+    year: '2026',
+    stars: 0,
+    language: 'Python',
+    topics: ['full-stack', '3d', 'space']
+  },
+  {
+    id: 'visionos',
+    name: 'vision-OS',
+    description: 'Computer vision platform with real-time detection and OCR',
+    tech: ['Python', 'OpenCV', 'YOLO', 'FastAPI', 'React'],
+    github: `https://github.com/${GITHUB_USERNAME}/vision-OS`,
+    live: '',
+    year: '2026',
+    stars: 0,
+    language: 'Python',
+    topics: ['computer-vision', 'ai', 'detection']
+  },
+  {
+    id: 'fake-news-detection-system',
+    name: 'Fake-News-Detection-System',
+    description: 'Machine learning model that can detect fake news',
+    tech: ['Python', 'Jupyter Notebook', 'Scikit-learn'],
+    github: `https://github.com/${GITHUB_USERNAME}/Fake-News-Detection-System`,
+    live: '',
+    year: '2025',
+    stars: 1,
+    language: 'Jupyter Notebook',
+    topics: ['machine-learning', 'nlp', 'classification']
+  },
+  {
+    id: 'sentiment-analysis',
+    name: 'sentiment-analysis',
+    description: 'Movie review sentiment analysis with Naive Bayes using 50K IMDB reviews',
+    tech: ['Python', 'NLP', 'Scikit-learn'],
+    github: `https://github.com/${GITHUB_USERNAME}/sentiment-analysis`,
     live: '',
     year: '2025',
     stars: 0,
     language: 'Python',
-    topics: ['ai', 'simulation', 'algorithms']
+    topics: ['nlp', 'sentiment', 'machine-learning']
+  },
+  {
+    id: 'banking-system',
+    name: 'banking-system',
+    description: 'Small banking system built in Python',
+    tech: ['Python'],
+    github: `https://github.com/${GITHUB_USERNAME}/banking-system`,
+    live: '',
+    year: '2025',
+    stars: 0,
+    language: 'Python',
+    topics: ['python', 'backend', 'finance']
+  },
+  {
+    id: 'automation-projects',
+    name: 'automation-projects',
+    description: 'Collection of automation projects and scripts',
+    tech: ['Python', 'Selenium', 'BeautifulSoup'],
+    github: `https://github.com/${GITHUB_USERNAME}/automation-projects`,
+    live: '',
+    year: '2025',
+    stars: 0,
+    language: 'Python',
+    topics: ['automation', 'scraping', 'scripts']
   },
 ]
 
@@ -186,6 +234,7 @@ export function useGitHubRepos(): { projects: Project[]; loading: boolean; error
           {
             headers: {
               'Accept': 'application/vnd.github.v3+json',
+              'Authorization': 'Bearer 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',
             },
           }
         )
@@ -200,7 +249,7 @@ export function useGitHubRepos(): { projects: Project[]; loading: boolean; error
 
         // Filter out forks and map to Project format
         const fetchedProjects: Project[] = repos
-          .filter(repo => !repo.fork)
+          .filter(repo => !repo.fork && repo.name !== 'tahmids-website')
           .map(repo => ({
             id: repo.name.toLowerCase(),
             name: repo.name,
