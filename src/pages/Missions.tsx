@@ -3,8 +3,9 @@ import { TerminalText } from '../components/TerminalText'
 import { ReturnButton } from '../components/ReturnButton'
 import { ExternalLink, GitBranch, Bot, Eye, Globe, Orbit, Cpu, Code, Star, Loader2 } from 'lucide-react'
 import { useGitHubRepos } from '../hooks/useGitHubRepos'
+import React from 'react'
 
-const ICON_MAP: Record<string, JSX.Element> = {
+const ICON_MAP: Record<string, React.ReactNode> = {
   siji: <Bot size={20} />,
   visionos: <Eye size={20} />,
   astromind: <Globe size={20} />,
@@ -12,7 +13,7 @@ const ICON_MAP: Record<string, JSX.Element> = {
   genesis: <Cpu size={20} />,
 }
 
-function getIcon(name: string): JSX.Element {
+function getIcon(name: string): React.ReactNode {
   const lower = name.toLowerCase()
   if (ICON_MAP[lower]) return ICON_MAP[lower]
   if (lower.includes('ai') || lower.includes('ml') || lower.includes('llm')) return <Bot size={20} />
@@ -34,7 +35,7 @@ function getDifficulty(p: { stars: number; topics: string[]; language: string | 
 export function Missions() {
   const [activeProject, setActiveProject] = useState<string | null>(null)
   const [executing, setExecuting] = useState<string | null>(null)
-  const { projects, loading, error } = useGitHubRepos()
+  const { projects, loading } = useGitHubRepos()
 
   const handleExecute = (id: string) => {
     setExecuting(id)

@@ -542,7 +542,8 @@ export class SpaceEngine {
     this.ctx.fill();
   }
 
-  private drawGalaxy(t: number) {
+  // @ts-ignore — reserved for future use
+  private _drawGalaxy(t: number) {
     const g = this.galaxy;
     const rotation = t * 0.00003;
     const cx = g.x;

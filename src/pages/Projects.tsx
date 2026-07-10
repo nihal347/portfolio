@@ -2,8 +2,9 @@ import { ReturnButton } from '../components/ReturnButton'
 import { TerminalText } from '../components/TerminalText'
 import { GitBranch, Bot, Eye, Globe, Orbit, Cpu, ExternalLink, Star, Loader2 } from 'lucide-react'
 import { useGitHubRepos } from '../hooks/useGitHubRepos'
+import React from 'react'
 
-const ICON_MAP: Record<string, JSX.Element> = {
+const ICON_MAP: Record<string, React.ReactNode> = {
   siji: <Bot size={18} />,
   visionos: <Eye size={18} />,
   astromind: <Globe size={18} />,
@@ -11,7 +12,7 @@ const ICON_MAP: Record<string, JSX.Element> = {
   genesis: <Cpu size={18} />,
 }
 
-function getIcon(name: string): JSX.Element {
+function getIcon(name: string): React.ReactNode {
   const lower = name.toLowerCase()
   if (ICON_MAP[lower]) return ICON_MAP[lower]
   if (lower.includes('ai') || lower.includes('ml') || lower.includes('llm')) return <Bot size={18} />

@@ -275,7 +275,7 @@ export const useStore = create<AppState>()(
         set((s) => ({
           ship: { ...s.ship, phase: 'arrived' },
           activePlanet: target,
-          currentView: (target && viewMap[target]) || 'hub',
+          currentView: ((target && viewMap[target]) || 'hub') as ViewState,
         }))
         if (target) {
           get().addExploration(15)
