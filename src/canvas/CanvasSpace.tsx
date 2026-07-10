@@ -88,7 +88,19 @@ export function CanvasSpace() {
     window.addEventListener('mousemove', handleMouseMove);
     canvas.addEventListener('click', handleClick);
 
+    let lastPinchDist = 0;
+
+    const getPinchDist = (touches: TouchList) => {
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.hypot(dx, dy);
+    };
+
     const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        lastPinchDist = getPinchDist(e.touches);
+        return;
+      }
       if (e.touches.length === 1) {
         const touch = e.touches[0];
         const synthetic = new MouseEvent('click', { clientX: touch.clientX, clientY: touch.clientY });
@@ -97,9 +109,34 @@ export function CanvasSpace() {
     };
 
     const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        const dist = getPinchDist(e.touches);
+        if (lastPinchDist > 0) {
+          const delta = dist - lastPinchDist;
+          const state = useStore.getState();
+          const levels = [0.4, 0.65, 1, 1.5, 2];
+          const current = state.controls.zoom;
+          const idx = levels.indexOf(current);
+          if (delta > 8 && idx < levels.length - 1) {
+            useStore.getState().cycleZoom();
+          } else if (delta < -8 && idx > 0) {
+            const prev = levels[(idx - 1 + levels.length) % levels.length];
+            useStore.setState({ controls: { ...state.controls, zoom: prev } });
+          }
+        }
+        lastPinchDist = dist;
+        return;
+      }
       if (e.touches.length === 1) {
         const touch = e.touches[0];
         engine.setMousePos(touch.clientX, touch.clientY);
+      }
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (e.touches.length < 2) {
+        lastPinchDist = 0;
       }
     };
 
@@ -125,8 +162,9 @@ export function CanvasSpace() {
 
     canvas.addEventListener('wheel', handleWheel, { passive: false });
     canvas.addEventListener('touchstart', handleTouchStart, { passive: true });
-    canvas.addEventListener('touchmove', handleTouchMove, { passive: true });
+    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
     canvas.addEventListener('touchmove', handleTouchScroll, { passive: true });
+    canvas.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     let lastTime = performance.now();
 
@@ -337,6 +375,7 @@ export function CanvasSpace() {
       canvas.removeEventListener('touchstart', handleTouchStart);
       canvas.removeEventListener('touchmove', handleTouchMove);
       canvas.removeEventListener('touchmove', handleTouchScroll);
+      canvas.removeEventListener('touchend', handleTouchEnd);
       cancelAnimationFrame(animRef.current);
     };
   }, [settings.simpleView, handleClick, handleMouseMove]);
